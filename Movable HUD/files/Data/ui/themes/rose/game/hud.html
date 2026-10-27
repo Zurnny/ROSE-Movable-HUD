@@ -14,9 +14,9 @@
         <link type="text/rcss" href="../styles/sp_addons_steampunk_sprites.css" />
 
 		<style>
-            /* ==== Parts of the page for one look only ==== */
-            .sp-only-steampunk { display: none; }
-            .sp-theme-steampunk .sp-only-default { display: none; }
+            /* ==== Parts of the page for one look only (the other look's part stays hidden) ==== */
+            .sp-theme-default .sp-only-steampunk { display: none !important; }
+            .sp-theme-steampunk .sp-only-default { display: none !important; }
 
             /* ==== Both looks ==== */
             body { margin: 5dp; }
@@ -85,7 +85,7 @@
             .sp-theme-steampunk .sp-cap { width: 7dp; height: 18dp; flex-shrink: 0; }
             .sp-theme-steampunk .sp-cap.left { decorator: image(sp-cap-l); }
             .sp-theme-steampunk .sp-cap.right { decorator: image(sp-cap-r); }
-            .sp-theme-steampunk .sp-track { position: relative; flex: 1; height: 14dp; display: flex; flex-direction: row; justify-content: center; align-items: center; decorator: tiled-horizontal(sp-track-l, sp-track-c, sp-track-r); }
+            .sp-theme-steampunk .sp-track-sp { position: relative; flex: 1; height: 14dp; display: flex; flex-direction: row; justify-content: center; align-items: center; decorator: tiled-horizontal(sp-track-l, sp-track-c, sp-track-r); }
             .sp-theme-steampunk .sp-fill { position: absolute; left: 0; top: 1dp; height: 13dp; decorator: image(sp-glare); }
             .sp-theme-steampunk .sp-fill.hp { background-color: rgb(184, 70, 30); }
             .sp-theme-steampunk .sp-fill.mp { background-color: rgb(63, 138, 116); }
@@ -98,7 +98,7 @@
             .sp-theme-steampunk #exp > span.exp-text { position: absolute; left: 0dp; top: 0dp; width: 100%; height: 11dp; line-height: 11dp; text-align: center; font-size: 11dp; font-weight: 800; color: rgb(255, 255, 255); font-effect: outline(1dp black); pointer-events: none; }
             .sp-theme-steampunk .sp-gauge.exp { height: 14dp; margin-bottom: 0; }
             .sp-theme-steampunk .sp-gauge.exp .sp-cap { width: 6dp; height: 14dp; }
-            .sp-theme-steampunk .sp-gauge.exp .sp-track { height: 11dp; }
+            .sp-theme-steampunk .sp-gauge.exp .sp-track-sp { height: 11dp; }
             .sp-theme-steampunk .sp-fill.exp { top: 1dp; height: 10dp; background-color: rgb(217, 176, 106); }
             .sp-theme-steampunk .sp-gauge.exp .sp-gauge-text { top: 1dp; font-size: 10dp; line-height: 11dp; }
             .sp-theme-steampunk .weapon-slot { position: absolute; left: 181dp; top: 36dp; width: 55dp; height: 55dp; decorator: image(sp-slot); }
@@ -125,8 +125,8 @@
             .sp-theme-steampunk .sp-tip-row { display: block; }
             .sp-theme-steampunk .sp-tip-warn { display: block; color: rgb(170, 50, 30); }
             .sp-theme-steampunk .sp-tip-note { display: block; color: rgb(120, 86, 46); font-size: 11dp; line-height: 15dp; font-weight: 600; }
-            .sp-theme-steampunk #sp-track { display: none; }
-            .sp-theme-steampunk #sp-weapon-src { display: none; }
+            .sp-theme-steampunk #sp-track-sp { display: none; }
+            .sp-theme-steampunk #sp-weapon-src-sp { display: none; }
             .sp-theme-steampunk #sp-track-timer { position: absolute; width: 1dp; height: 1dp; opacity: 0; animation: 5s sp-track-tick-a; }
             .sp-theme-steampunk .sp-zulie { position: relative; pointer-events: auto; cursor: hand; }
             .sp-theme-steampunk .sp-zulie .sp-tip { left: auto; right: -6dp; width: 196dp; margin-top: 4dp; }
@@ -168,11 +168,7 @@ pcall(function()
         body:SetClass('sp-theme-default', not sp)
         body:SetClass('sp-theme-steampunk', sp)
     end
-    -- parts written for the other look are taken out, so only one of each is left
-    local gone, list = {}, document:QuerySelectorAll(sp and '.sp-only-default' or '.sp-only-steampunk')
-    local i = list[0] and 0 or 1
-    while list[i] do gone[#gone + 1] = list[i]; i = i + 1 end
-    for _, e in ipairs(gone) do pcall(function() e.parent_node:RemoveChild(e) end) end
+    -- (parts written for the other look stay in the window, hidden)
 end)
         </script>
 		<script>
@@ -317,7 +313,7 @@ pcall(function()
                 money0 = v.money, money = v.money, hist = {{0, 0, v.money}}}
     end
     local function read()
-        local src = el('sp-track')
+        local src = el('sp-track-sp')
         if not src then return nil end
         local v = {name = src:GetAttribute('sp-name') or '', lv = tonumber(src:GetAttribute('sp-lv')),
                    exp = tonumber(src:GetAttribute('sp-exp')), max = tonumber(src:GetAttribute('sp-max')),
@@ -358,17 +354,17 @@ pcall(function()
         if not S then return end
         local xph = rates()
         if not xph then
-            set('sp-xp-rate', 'Per hour: gathering data...')
-            set('sp-xp-eta', '')
+            set('sp-xp-rate-sp', 'Per hour: gathering data...')
+            set('sp-xp-eta-sp', '')
         else
-            set('sp-xp-rate', 'Per hour: ' .. num(math.max(0, xph)))
+            set('sp-xp-rate-sp', 'Per hour: ' .. num(math.max(0, xph)))
             if xph > 0 and S.max > 0 then
-                set('sp-xp-eta', 'Next level in: ' .. span((S.max - S.exp) * 3600 / xph))
+                set('sp-xp-eta-sp', 'Next level in: ' .. span((S.max - S.exp) * 3600 / xph))
             else
-                set('sp-xp-eta', 'Next level in: -')
+                set('sp-xp-eta-sp', 'Next level in: -')
             end
         end
-        set('sp-xp-session', 'This session: +' .. num(math.max(0, S.xp)) .. ' (' .. span(S.ticks * STEP) .. ')')
+        set('sp-xp-session-sp', 'This session: +' .. num(math.max(0, S.xp)) .. ' (' .. span(S.ticks * STEP) .. ')')
     end
     local function show_zuly()
         if not S then return end
@@ -381,7 +377,7 @@ pcall(function()
     -- hover handlers
     local exp_gauge = nil
     do
-        local r = el('sp-xp-rate')
+        local r = el('sp-xp-rate-sp')
         if r then exp_gauge = r.parent_node and r.parent_node.parent_node end
     end
     if exp_gauge then exp_gauge:AddEventListener('mouseover', function() pcall(show_xp) end) end
@@ -416,7 +412,8 @@ pcall(function()
     local last = nil
     local function el(id) return document:GetElementById(id) end
     local function check()
-        local src, slot = el('sp-weapon-src'), el('sp-weapon-slot')
+        local sp = SP_THEME == 'steampunk' and '-sp' or ''
+        local src, slot = el('sp-weapon-src' .. sp), el('sp-weapon-slot' .. sp)
         if not src or not slot then return end
         if SP_ADDON_ON and not SP_ADDON_ON('weapon_refresh') then last = nil; return end
         local key = src:GetAttribute('sp-key') or ''
@@ -648,7 +645,7 @@ end)
 
 			<!-- Character plate -->
 			<div class="sp-plate" data-model="character">
-				<span id="sp-track" data-attr-sp-name="name" data-attr-sp-lv="level" data-attr-sp-exp="experience" data-attr-sp-max="max_experience" data-attr-sp-money="money"></span>
+				<span id="sp-track-sp" data-attr-sp-name="name" data-attr-sp-lv="level" data-attr-sp-exp="experience" data-attr-sp-max="max_experience" data-attr-sp-money="money"></span>
 				<div class="sp-title">
 					<span class="sp-name">{{name}}</span>
 					<span class="sp-job"><span class="sp-level">Lv {{level}}</span><str data-attr-job-name="job">Visitor</str></span>
@@ -691,9 +688,9 @@ end)
 						<div class="sp-tip">
 							<span class="sp-tip-title">Experience</span>
 							<span class="sp-tip-row">{{experience}} / {{max_experience}}</span>
-							<span class="sp-tip-row" id="sp-xp-rate">Per hour: gathering data...</span>
-							<span class="sp-tip-row" id="sp-xp-eta"></span>
-							<span class="sp-tip-row" id="sp-xp-session"></span>
+							<span class="sp-tip-row" id="sp-xp-rate-sp">Per hour: gathering data...</span>
+							<span class="sp-tip-row" id="sp-xp-eta-sp"></span>
+							<span class="sp-tip-row" id="sp-xp-session-sp"></span>
 							<span class="sp-tip-warn" data-if="experience_gain_disabled">Experience gain is turned off</span>
 						</div>
 					</div>
@@ -702,11 +699,11 @@ end)
 
 			<!-- Weapon / ammo slot (its own data model, so it sits beside the plate, not inside it) -->
 			<div class="weapon-slot" data-model="inventory">
-				<span id="sp-weapon-src" data-attr-sp-key="equipped_weapon.key" data-attr-sp-dur="equipped_weapon.durability" data-attr-sp-life="equipped_weapon.life"></span>
+				<span id="sp-weapon-src-sp" data-attr-sp-key="equipped_weapon.key" data-attr-sp-dur="equipped_weapon.durability" data-attr-sp-life="equipped_weapon.life"></span>
 				<img sprite="GEN_INVSLOT08"
 					data-if="equipped_weapon.id == 0 &amp;&amp; equipped_shot_item.id == 0" />
 
-				<item-slot id="sp-weapon-slot" data-if="equipped_shot_item.id == 0"
+				<item-slot id="sp-weapon-slot-sp" data-if="equipped_shot_item.id == 0"
 					data-attr-item-key="equipped_weapon.key"
 					data-attr-item-id="equipped_weapon.id"
 					data-attr-item-type="equipped_weapon.type"

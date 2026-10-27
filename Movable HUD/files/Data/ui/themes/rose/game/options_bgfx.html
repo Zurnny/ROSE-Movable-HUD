@@ -5,9 +5,9 @@
         <link type="text/template" href="../templates/window-resizeable.html" />
 
         <style>
-            /* ==== Parts of the page for one look only ==== */
-            .sp-only-steampunk { display: none; }
-            .sp-theme-steampunk .sp-only-default { display: none; }
+            /* ==== Parts of the page for one look only (the other look's part stays hidden) ==== */
+            .sp-theme-default .sp-only-steampunk { display: none !important; }
+            .sp-theme-steampunk .sp-only-default { display: none !important; }
 
             /* ==== Both looks ==== */
             #game-options { min-width: 650dp; min-height: 350dp; width: 870dp; height: 570dp; }
@@ -94,11 +94,7 @@ pcall(function()
         body:SetClass('sp-theme-default', not sp)
         body:SetClass('sp-theme-steampunk', sp)
     end
-    -- parts written for the other look are taken out, so only one of each is left
-    local gone, list = {}, document:QuerySelectorAll(sp and '.sp-only-default' or '.sp-only-steampunk')
-    local i = list[0] and 0 or 1
-    while list[i] do gone[#gone + 1] = list[i]; i = i + 1 end
-    for _, e in ipairs(gone) do pcall(function() e.parent_node:RemoveChild(e) end) end
+    -- (parts written for the other look stay in the window, hidden)
 end)
         </script>
     <script>
