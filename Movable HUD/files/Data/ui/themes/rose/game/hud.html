@@ -1,0 +1,775 @@
+<rml>
+
+	<head>
+		<title></title>
+		<link type="text/template" href="../templates/window-box.html" />
+		<link type="text/template" href="../templates/elements/gauge.html" />
+		<link type="text/rcss" href="../styles/spritesheet_itemicon.css" />
+		<link type="text/rcss" href="../styles/spritesheet_socketgem.css" />
+		<link type="text/rcss" href="../styles/spritesheet_elementicon.css" />
+		<link type="text/rcss" href="../styles/item_slot.css" />
+		<link type="text/rcss" href="../styles/spritesheet_inventory.css" />
+		<link type="text/rcss" href="../styles/components.css" />
+		<link type="text/rcss" href="../styles/spritesheet_icons.css" />
+        <link type="text/rcss" href="../styles/sp_addons_steampunk_sprites.css" />
+
+		<style>
+            /* ==== Parts of the page for one look only ==== */
+            .sp-only-steampunk { display: none; }
+            .sp-theme-steampunk .sp-only-default { display: none; }
+
+            /* ==== Both looks ==== */
+            body { margin: 5dp; }
+            .hud-status-row { display: flex; flex-wrap: wrap; }
+            .hud-status-icon { display: inline-block; width: 20dp; height: 20dp; margin: 0 1dp 1dp 0; flex-shrink: 0; }
+            .hud-status-icon img { width: 20dp; height: 20dp; pointer-events: none; }
+            .hud-status-icon.blink { opacity: 0.25; }
+            .hud-status-icon.inactive img { image-color: rgb(255, 0, 0); }
+            .hud-status-icon.warning img { image-color: rgb(255, 180, 180); }
+            gauge.low-value-animation { animation: 1.5s cubic-in-out infinite alternate low; }
+            .sp-wslot { display: none; }
+            #hud .sp-move { pointer-events: none; }
+            #sp-exp-wrap { position: relative; display: flex; flex-direction: column; }
+            #sp-exp-wrap:hover .sp-tip { visibility: visible; }
+            #sp-exp-cover { position: absolute; left: 0dp; top: 0dp; right: 0dp; bottom: 0dp; z-index: 10; }
+            .sp-tip-title.second { margin-top: 6dp; }
+            .sp-tip-row { display: block; }
+            #sp-track { display: none; }
+            #sp-weapon-src { display: none; }
+            #sp-track-timer { position: absolute; width: 1dp; height: 1dp; opacity: 0; animation: 5s sp-track-tick-a; }
+            #hud.sp-exp-off #sp-exp-wrap .sp-tip { display: none; }
+            #hud.sp-exp-off .sp-gauge.exp .sp-tip { display: none; }
+            #hud.sp-exp-off #sp-exp-cover { display: none; }
+            #sp-switch-timer { position: absolute; width: 1dp; height: 1dp; opacity: 0; pointer-events: none; animation: 2s sp-switch-tick-a; }
+
+            /* ==== Default UI look only ==== */
+            .sp-theme-default .window-title { font-size: 12dp; }
+            .sp-theme-default #window-title-text { padding-top: 2dp; }
+            .sp-theme-default .window-fixed-size { padding-top: 20dp; }
+            .sp-theme-default #state-icon-container { margin-top: 5dp; width: 195dp; }
+            .sp-theme-default #window-content.content { padding: 1dp 2dp 1dp 1dp; display: flex; flex-direction: column; }
+            .sp-theme-default span.marker { position: absolute; }
+            .sp-theme-default div.footer { flex: 2; display: flex; flex-direction: row; justify-content: center; align-items: center; margin: 2dp 2dp 0 2dp; font-size: 12dp; }
+            .sp-theme-default div.footer>span.left { flex-grow: 1; text-align: left; font-weight: 800; }
+            .sp-theme-default div.footer>span.right { flex-grow: 1; text-align: right; }
+            .sp-theme-default b.weight { color: yellow; }
+            .sp-theme-default span.level { color: yellow; }
+            #hud.sp-theme-default.sp-on-ui_fixes #exp { position: relative; height: 13dp; }
+            #hud.sp-theme-default.sp-on-ui_fixes #exp > span.exp-text { position: absolute; left: 0dp; top: 0dp; width: 100%; height: 13dp; line-height: 13dp; text-align: center; font-size: 12dp; pointer-events: none; }
+            .sp-theme-default div.container { flex: 2; display: flex; }
+            .sp-theme-default div.hud { width: 195dp; }
+            .sp-theme-default div.pat-fuel { display: flex; height: 100%; flex-direction: column; justify-content: flex-end; margin-left: 5dp; }
+            .sp-theme-default .fuel-container { height: 100%; }
+            #hud.sp-theme-default.sp-on-weapon_slot .sp-wslot { display: block; }
+            #hud.sp-theme-default.sp-on-weapon_slot #window-title-text { display: block; height: 20dp; line-height: 20dp; padding-top: 1dp; }
+            #hud.sp-theme-default.sp-on-weapon_slot .window-fixed-size { width: 250dp; }
+            #hud.sp-theme-default.sp-on-weapon_slot div.weapon-slot { position: absolute; left: 200dp; top: 32dp; width: 42dp; height: 42dp; }
+            #hud.sp-theme-default.sp-on-weapon_slot div.weapon-slot > img { position: absolute; left: -3dp; top: -4dp; width: 50dp; height: 50dp; pointer-events: none; }
+            #hud.sp-theme-default.sp-on-weapon_slot div.weapon-slot item-slot { position: absolute; left: -4dp; top: -4dp; width: 50dp; height: 50dp; }
+            #hud.sp-theme-default.sp-on-hud_move .sp-move { pointer-events: auto; }
+            .sp-theme-default .tooltip .tooltiptext { background: rgba(0, 0, 0, 200); min-width: 50dp; width: 80dp; left: 100%; bottom: 50dp; }
+            .sp-theme-default .sp-tip { visibility: hidden; position: absolute; z-index: 100; left: 0dp; top: 100%; margin-top: 4dp; width: 210dp; padding: 6dp 8dp; background: rgba(0, 0, 0, 220); border: 1dp rgb(150, 150, 150); border-radius: 3dp; color: white; font-size: 12dp; line-height: 16dp; font-weight: 600; text-align: left; pointer-events: none; }
+            .sp-theme-default .sp-tip-title { display: block; color: yellow; font-weight: 800; margin-bottom: 2dp; }
+            .sp-theme-default .sp-tip-warn { display: block; color: rgb(255, 120, 100); }
+            .sp-theme-default .sp-tip-note { display: block; color: rgb(180, 180, 180); font-size: 11dp; line-height: 15dp; }
+
+            /* ==== Steampunk look only ==== */
+            body.sp-theme-steampunk { margin: 5dp; }
+            .sp-theme-steampunk .sp-hud { position: relative; width: 248dp; height: 126dp; }
+            .sp-theme-steampunk .sp-plate { position: absolute; left: 0; top: 0; width: 248dp; height: 126dp; decorator: tiled-box( sp-frame-tl, sp-frame-t, sp-frame-tr, sp-frame-l, sp-frame-c, sp-frame-r, sp-frame-bl, sp-frame-b, sp-frame-br ); font-family: Nunito; color: rgb(241, 227, 196); }
+            .sp-theme-steampunk .sp-title { position: absolute; left: 14dp; top: 8dp; width: 220dp; height: 20dp; display: flex; flex-direction: row; justify-content: space-between; align-items: center; }
+            .sp-theme-steampunk .sp-name { font-size: 15dp; font-weight: 800; line-height: 20dp; color: rgb(243, 211, 138); font-effect: outline(1dp rgb(40, 25, 10)); white-space: nowrap; overflow: hidden; }
+            .sp-theme-steampunk .sp-job { font-size: 12dp; font-weight: 700; line-height: 20dp; color: rgb(201, 180, 138); font-effect: outline(1dp rgb(40, 25, 10)); white-space: nowrap; }
+            .sp-theme-steampunk .sp-bars { position: absolute; left: 14dp; top: 34dp; width: 162dp; }
+            .sp-theme-steampunk .sp-gauge { position: relative; display: flex; flex-direction: row; align-items: center; height: 18dp; margin-bottom: 4dp; }
+            .sp-theme-steampunk .sp-cap { width: 7dp; height: 18dp; flex-shrink: 0; }
+            .sp-theme-steampunk .sp-cap.left { decorator: image(sp-cap-l); }
+            .sp-theme-steampunk .sp-cap.right { decorator: image(sp-cap-r); }
+            .sp-theme-steampunk .sp-track { position: relative; flex: 1; height: 14dp; display: flex; flex-direction: row; justify-content: center; align-items: center; decorator: tiled-horizontal(sp-track-l, sp-track-c, sp-track-r); }
+            .sp-theme-steampunk .sp-fill { position: absolute; left: 0; top: 1dp; height: 13dp; decorator: image(sp-glare); }
+            .sp-theme-steampunk .sp-fill.hp { background-color: rgb(184, 70, 30); }
+            .sp-theme-steampunk .sp-fill.mp { background-color: rgb(63, 138, 116); }
+            .sp-theme-steampunk .sp-gauge-text { display: block; position: relative; top: 2dp; flex: 0 0 auto; white-space: nowrap; text-align: center; font-size: 12dp; line-height: 14dp; font-weight: 800; color: rgb(255, 244, 224); font-effect: outline(1dp black); }
+            .sp-theme-steampunk .sp-gauge-text.low { animation: 1.5s cubic-in-out infinite alternate sp-low; }
+            .sp-theme-steampunk .sp-gauge gauge { flex: 0 0 auto; width: 148dp; height: 18dp; }
+            .sp-theme-steampunk .sp-gauge.exp gauge { width: 150dp; height: 11dp; }
+            .sp-theme-steampunk gauge.low-value-animation { animation: 1.5s cubic-in-out infinite alternate low; }
+            .sp-theme-steampunk #exp { position: relative; }
+            .sp-theme-steampunk #exp > span.exp-text { position: absolute; left: 0dp; top: 0dp; width: 100%; height: 11dp; line-height: 11dp; text-align: center; font-size: 11dp; font-weight: 800; color: rgb(255, 255, 255); font-effect: outline(1dp black); pointer-events: none; }
+            .sp-theme-steampunk .sp-gauge.exp { height: 14dp; margin-bottom: 0; }
+            .sp-theme-steampunk .sp-gauge.exp .sp-cap { width: 6dp; height: 14dp; }
+            .sp-theme-steampunk .sp-gauge.exp .sp-track { height: 11dp; }
+            .sp-theme-steampunk .sp-fill.exp { top: 1dp; height: 10dp; background-color: rgb(217, 176, 106); }
+            .sp-theme-steampunk .sp-gauge.exp .sp-gauge-text { top: 1dp; font-size: 10dp; line-height: 11dp; }
+            .sp-theme-steampunk .weapon-slot { position: absolute; left: 181dp; top: 36dp; width: 55dp; height: 55dp; decorator: image(sp-slot); }
+            .sp-theme-steampunk .weapon-slot > img { pointer-events: none; }
+            .sp-theme-steampunk .weapon-slot > item-slot { position: absolute; left: 3dp; top: 3dp; width: 49dp; height: 49dp; }
+            .sp-theme-steampunk .weapon-slot > img { position: absolute; left: 3dp; top: 3dp; width: 49dp; height: 49dp; }
+            .sp-theme-steampunk .sp-drag { position: absolute; left: 14dp; top: 102dp; width: 220dp; height: 16dp; cursor: move; }
+            .sp-theme-steampunk .sp-footer { display: flex; flex-direction: row; justify-content: space-between; align-items: center; height: 16dp; padding-top: 1dp; border-top: 1dp rgb(122, 86, 36); font-family: Nunito; font-size: 12dp; line-height: 15dp; font-weight: 700; color: rgb(241, 227, 196); font-effect: outline(1dp rgb(40, 25, 10)); pointer-events: none; }
+            .sp-theme-steampunk .sp-footer b { color: rgb(243, 211, 138); font-weight: 800; }
+            .sp-theme-steampunk .sp-zulie { display: flex; flex-direction: row; align-items: center; gap: 3dp; }
+            .sp-theme-steampunk .sp-zulie img { width: 14dp; height: 14dp; }
+            .sp-theme-steampunk .pat-fuel { position: absolute; left: 254dp; top: 101dp; }
+            .sp-theme-steampunk #state-icon-container { margin-top: 5dp; width: 248dp; }
+            .sp-theme-steampunk .hud-status-row { display: flex; flex-wrap: wrap; }
+            .sp-theme-steampunk .hud-status-icon { display: inline-block; width: 20dp; height: 20dp; margin: 0 1dp 1dp 0; flex-shrink: 0; }
+            .sp-theme-steampunk .hud-status-icon img { width: 20dp; height: 20dp; pointer-events: none; }
+            .sp-theme-steampunk .hud-status-icon.blink { opacity: 0.25; }
+            .sp-theme-steampunk .hud-status-icon.inactive img { image-color: rgb(255, 0, 0); }
+            .sp-theme-steampunk .hud-status-icon.warning img { image-color: rgb(255, 180, 180); }
+            .sp-theme-steampunk .sp-tip { position: absolute; left: 0; top: 100%; z-index: 10; width: 182dp; margin-top: 3dp; padding: 4dp 6dp; background: rgba(226, 208, 170, 245); border: 1dp rgb(122, 86, 36); border-radius: 1dp; color: rgb(60, 40, 20); font-size: 13dp; line-height: 18dp; font-weight: 700; font-effect: none; text-align: left; visibility: hidden; pointer-events: none; }
+            .sp-theme-steampunk .sp-gauge:hover .sp-tip { visibility: visible; }
+            .sp-theme-steampunk .sp-level { color: rgb(243, 211, 138); font-weight: 800; margin-right: 5dp; }
+            .sp-theme-steampunk .sp-tip-title { display: block; font-weight: 800; color: rgb(90, 50, 15); border-bottom: 1dp rgb(161, 124, 72); margin-bottom: 2dp; }
+            .sp-theme-steampunk .sp-tip-row { display: block; }
+            .sp-theme-steampunk .sp-tip-warn { display: block; color: rgb(170, 50, 30); }
+            .sp-theme-steampunk .sp-tip-note { display: block; color: rgb(120, 86, 46); font-size: 11dp; line-height: 15dp; font-weight: 600; }
+            .sp-theme-steampunk #sp-track { display: none; }
+            .sp-theme-steampunk #sp-weapon-src { display: none; }
+            .sp-theme-steampunk #sp-track-timer { position: absolute; width: 1dp; height: 1dp; opacity: 0; animation: 5s sp-track-tick-a; }
+            .sp-theme-steampunk .sp-zulie { position: relative; pointer-events: auto; cursor: hand; }
+            .sp-theme-steampunk .sp-zulie .sp-tip { left: auto; right: -6dp; width: 196dp; margin-top: 4dp; }
+            .sp-theme-steampunk .sp-zulie:hover .sp-tip { visibility: visible; }
+
+            @keyframes low {
+			from {
+			color: red;
+			}
+
+			to {
+			color: white;
+			}
+			}
+            @keyframes sp-track-tick-a { from { opacity: 0; } to { opacity: 0; } }
+            @keyframes sp-track-tick-b { from { opacity: 0; } to { opacity: 0; } }
+            @keyframes sp-switch-tick-a { from { opacity: 0; } to { opacity: 0; } }
+            @keyframes sp-switch-tick-b { from { opacity: 0; } to { opacity: 0; } }
+            @keyframes sp-low
+			{
+				from { color: rgb(255, 80, 60); }
+				to   { color: rgb(255, 244, 224); }
+			}
+        </style>
+        <script>
+-- Theme check (add-on windows work with the default UI and with the Steampunk
+-- UI theme). Steampunk is installed when styles/steampunk.css exists; then this
+-- window gets the class sp-theme-steampunk and uses the Steampunk look,
+-- otherwise sp-theme-default and the game's own look. SP_THEME says which.
+pcall(function()
+    local sp = false
+    pcall(function()
+        local f = io.open('Data/ui/themes/rose/styles/steampunk.css', 'r')
+        if f then f:close(); sp = true end
+    end)
+    SP_THEME = sp and 'steampunk' or 'default'
+    local body = document:GetElementById('hud')
+    if body then
+        body:SetClass('sp-theme-default', not sp)
+        body:SetClass('sp-theme-steampunk', sp)
+    end
+    -- parts written for the other look are taken out, so only one of each is left
+    local gone, list = {}, document:QuerySelectorAll(sp and '.sp-only-default' or '.sp-only-steampunk')
+    local i = list[0] and 0 or 1
+    while list[i] do gone[#gone + 1] = list[i]; i = i + 1 end
+    for _, e in ipairs(gone) do pcall(function() e.parent_node:RemoveChild(e) end) end
+end)
+        </script>
+		<script>
+-- (runs only in the default UI look)
+if SP_THEME == 'steampunk' then return end
+-- Session trackers (EXP Tracker add-on).
+-- Every 5 seconds this notes your EXP. Hovering the EXP bar shows EXP per hour
+-- (over the last 10 minutes), time to the next level and what this session
+-- has earned.
+-- Double-click the EXP bar to start a new session. A new
+-- character starts a new session by itself. Text only changes while you hover,
+-- so nothing is redrawn in the background.
+pcall(function()
+    local document = document
+    local function el(id) return document:GetElementById(id) end
+    local STEP, WINDOW = 5, 120          -- seconds per sample, samples kept (10 min)
+    local function num(n)
+        local neg = n < 0
+        local t = string.format('%.0f', math.abs(n))
+        t = t:reverse():gsub('(%d%d%d)', '%1,'):reverse():gsub('^,', '')
+        return (neg and '-' or '') .. t
+    end
+    local function span(secs)
+        secs = math.floor(secs + 0.5)
+        local h, m = math.floor(secs / 3600), math.floor((secs % 3600) / 60)
+        if h >= 100 then return 'over 100h' end
+        if h > 0 then return h .. 'h ' .. m .. 'm' end
+        if m > 0 then return m .. 'm' end
+        return secs .. 's'
+    end
+    local S = nil   -- the session
+    local function fresh(v)
+        return {name = v.name, ticks = 0, xp = 0, lv = v.lv, exp = v.exp, max = v.max,
+                money0 = v.money, money = v.money, hist = {{0, 0, v.money}}}
+    end
+    local function read()
+        local src = el('sp-track')
+        if not src then return nil end
+        local v = {name = src:GetAttribute('sp-name') or '', lv = tonumber(src:GetAttribute('sp-lv')),
+                   exp = tonumber(src:GetAttribute('sp-exp')), max = tonumber(src:GetAttribute('sp-max')),
+                   money = tonumber(src:GetAttribute('sp-money'))}
+        if not v.lv or not v.exp or not v.max or not v.money or v.name == '' then return nil end
+        return v
+    end
+    local function tick()
+        local v = read()
+        if not v then return end
+        if not S or S.name ~= v.name then S = fresh(v); return end
+        -- experience gained since the last sample, counting level-ups
+        local gain
+        if v.lv > S.lv then
+            gain = math.max(0, S.max - S.exp) + v.exp
+        elseif v.lv == S.lv then
+            gain = v.exp - S.exp
+        else
+            gain = 0
+        end
+        S.xp = S.xp + gain
+        S.lv, S.exp, S.max, S.money = v.lv, v.exp, v.max, v.money
+        S.ticks = S.ticks + 1
+        table.insert(S.hist, {S.ticks, S.xp, v.money})
+        if #S.hist > WINDOW + 1 then table.remove(S.hist, 1) end
+    end
+    local function rates()
+        local a, b = S.hist[1], S.hist[#S.hist]
+        local secs = (b[1] - a[1]) * STEP
+        if secs < 60 then return nil end
+        return (b[2] - a[2]) * 3600 / secs, (b[3] - a[3]) * 3600 / secs
+    end
+    local function set(id, text)
+        local e = el(id)
+        if e then e.inner_rml = text end
+    end
+    local function show_xp()
+        if not S then return end
+        local xph = rates()
+        if not xph then
+            set('sp-xp-rate', 'Per hour: gathering data...')
+            set('sp-xp-eta', '')
+        else
+            set('sp-xp-rate', 'Per hour: ' .. num(math.max(0, xph)))
+            if xph > 0 and S.max > 0 then
+                set('sp-xp-eta', 'Next level in: ' .. span((S.max - S.exp) * 3600 / xph))
+            else
+                set('sp-xp-eta', 'Next level in: -')
+            end
+        end
+        set('sp-xp-session', 'This session: +' .. num(math.max(0, S.xp)) .. ' (' .. span(S.ticks * STEP) .. ')')
+    end
+    -- hover handlers
+    local wrap = el('sp-exp-wrap')
+    if wrap then
+        wrap:AddEventListener('mouseover', function() pcall(show_xp) end)
+        wrap:AddEventListener('dblclick', function()
+            local v = read()
+            if v then S = fresh(v) end
+            pcall(show_xp)
+        end)
+    end
+    local timer = el('sp-track-timer')
+    local flip = false
+    if timer then
+        timer:AddEventListener('animationend', function()
+            pcall(tick)
+            flip = not flip
+            timer.style.animation = STEP .. 's ' .. (flip and 'sp-track-tick-b' or 'sp-track-tick-a')
+        end)
+    end
+end)
+		</script>
+		<script>
+-- (runs only in the Steampunk look)
+if SP_THEME ~= 'steampunk' then return end
+-- Session trackers (steampunk add-on).
+-- Every 5 seconds this notes your EXP and Zulie. Hovering the EXP bar shows EXP
+-- per hour (over the last 10 minutes), time to the next level and what this
+-- session has earned; hovering the Zulie shows Zulie gained or spent this
+-- session and per hour. Double-click the Zulie to start a new session. A new
+-- character starts a new session by itself. Text only changes while you hover,
+-- so nothing is redrawn in the background.
+pcall(function()
+    local document = document
+    local function el(id) return document:GetElementById(id) end
+    local STEP, WINDOW = 5, 120          -- seconds per sample, samples kept (10 min)
+    local function num(n)
+        local neg = n < 0
+        local t = string.format('%.0f', math.abs(n))
+        t = t:reverse():gsub('(%d%d%d)', '%1,'):reverse():gsub('^,', '')
+        return (neg and '-' or '') .. t
+    end
+    local function span(secs)
+        secs = math.floor(secs + 0.5)
+        local h, m = math.floor(secs / 3600), math.floor((secs % 3600) / 60)
+        if h >= 100 then return 'over 100h' end
+        if h > 0 then return h .. 'h ' .. m .. 'm' end
+        if m > 0 then return m .. 'm' end
+        return secs .. 's'
+    end
+    local S = nil   -- the session
+    local function fresh(v)
+        return {name = v.name, ticks = 0, xp = 0, lv = v.lv, exp = v.exp, max = v.max,
+                money0 = v.money, money = v.money, hist = {{0, 0, v.money}}}
+    end
+    local function read()
+        local src = el('sp-track')
+        if not src then return nil end
+        local v = {name = src:GetAttribute('sp-name') or '', lv = tonumber(src:GetAttribute('sp-lv')),
+                   exp = tonumber(src:GetAttribute('sp-exp')), max = tonumber(src:GetAttribute('sp-max')),
+                   money = tonumber(src:GetAttribute('sp-money'))}
+        if not v.lv or not v.exp or not v.max or not v.money or v.name == '' then return nil end
+        return v
+    end
+    local function tick()
+        local v = read()
+        if not v then return end
+        if not S or S.name ~= v.name then S = fresh(v); return end
+        -- experience gained since the last sample, counting level-ups
+        local gain
+        if v.lv > S.lv then
+            gain = math.max(0, S.max - S.exp) + v.exp
+        elseif v.lv == S.lv then
+            gain = v.exp - S.exp
+        else
+            gain = 0
+        end
+        S.xp = S.xp + gain
+        S.lv, S.exp, S.max, S.money = v.lv, v.exp, v.max, v.money
+        S.ticks = S.ticks + 1
+        table.insert(S.hist, {S.ticks, S.xp, v.money})
+        if #S.hist > WINDOW + 1 then table.remove(S.hist, 1) end
+    end
+    local function rates()
+        local a, b = S.hist[1], S.hist[#S.hist]
+        local secs = (b[1] - a[1]) * STEP
+        if secs < 60 then return nil end
+        return (b[2] - a[2]) * 3600 / secs, (b[3] - a[3]) * 3600 / secs
+    end
+    local function set(id, text)
+        local e = el(id)
+        if e then e.inner_rml = text end
+    end
+    local function show_xp()
+        if not S then return end
+        local xph = rates()
+        if not xph then
+            set('sp-xp-rate', 'Per hour: gathering data...')
+            set('sp-xp-eta', '')
+        else
+            set('sp-xp-rate', 'Per hour: ' .. num(math.max(0, xph)))
+            if xph > 0 and S.max > 0 then
+                set('sp-xp-eta', 'Next level in: ' .. span((S.max - S.exp) * 3600 / xph))
+            else
+                set('sp-xp-eta', 'Next level in: -')
+            end
+        end
+        set('sp-xp-session', 'This session: +' .. num(math.max(0, S.xp)) .. ' (' .. span(S.ticks * STEP) .. ')')
+    end
+    local function show_zuly()
+        if not S then return end
+        local diff = S.money - S.money0
+        set('sp-zuly-session', (diff >= 0 and 'Gained: +' or 'Spent: ') .. num(diff) .. ' Zulie')
+        local _, zph = rates()
+        set('sp-zuly-rate', zph and ('Per hour: ' .. (zph >= 0 and '+' or '') .. num(zph) .. ' Zulie') or 'Per hour: gathering data...')
+        set('sp-zuly-time', 'Session length: ' .. span(S.ticks * STEP))
+    end
+    -- hover handlers
+    local exp_gauge = nil
+    do
+        local r = el('sp-xp-rate')
+        if r then exp_gauge = r.parent_node and r.parent_node.parent_node end
+    end
+    if exp_gauge then exp_gauge:AddEventListener('mouseover', function() pcall(show_xp) end) end
+    local z = el('sp-zulie')
+    if z then
+        z:AddEventListener('mouseover', function() pcall(show_zuly) end)
+        z:AddEventListener('dblclick', function()
+            local v = read()
+            if v then S = fresh(v) end
+            pcall(show_zuly)
+        end)
+    end
+    local timer = el('sp-track-timer')
+    local flip = false
+    if timer then
+        timer:AddEventListener('animationend', function()
+            pcall(tick)
+            flip = not flip
+            timer.style.animation = STEP .. 's ' .. (flip and 'sp-track-tick-b' or 'sp-track-tick-a')
+        end)
+    end
+end)
+		</script>
+		<script>
+-- Weapon durability refresh (Weapon Refresh add-on). The HUD's weapon slot only
+-- reads the weapon's details when the weapon changes, so durability and life
+-- lost in a fight didn't show (13/13 in the HUD, 12/13 in the inventory).
+-- Every 5 seconds this compares the live numbers; when they change it sets the
+-- slot's own values again so the slot reloads. Nothing else is touched.
+pcall(function()
+    local document = document
+    local last = nil
+    local function el(id) return document:GetElementById(id) end
+    local function check()
+        local src, slot = el('sp-weapon-src'), el('sp-weapon-slot')
+        if not src or not slot then return end
+        if SP_ADDON_ON and not SP_ADDON_ON('weapon_refresh') then last = nil; return end
+        local key = src:GetAttribute('sp-key') or ''
+        local dur = src:GetAttribute('sp-dur') or ''
+        local life = src:GetAttribute('sp-life') or ''
+        local now = key .. '|' .. dur .. '|' .. life
+        if last and now ~= last and key == last:match('^([^|]*)') and key ~= '' and key ~= '0' then
+            slot:SetAttribute('item-durability', dur)
+            slot:SetAttribute('item-life', life)
+            slot:SetAttribute('item-key', '0')
+            slot:SetAttribute('item-key', key)
+        end
+        last = now
+    end
+    local timer = el('sp-track-timer')
+    if timer then
+        timer:AddEventListener('animationend', function() pcall(check) end)
+    end
+end)
+		</script>
+    <script>
+-- HUD Weapon Slot, Movable HUD and Default UI Fixes: the switch script below
+-- calls these with on = installed and switched on; they put sp-on-<key> on
+-- the HUD, which turns that add-on's styles on.
+pcall(function()
+    local doc = document
+    SP_ADDON_HOOK = SP_ADDON_HOOK or {}
+    for _, k in ipairs({'weapon_slot', 'hud_move', 'ui_fixes'}) do
+        SP_ADDON_HOOK[k .. '@hud'] = function(on)
+            local b = doc:GetElementById('hud')
+            if b then b:SetClass('sp-on-' .. k, on) end
+        end
+    end
+end)
+    </script>
+    <script>
+-- Add-on switches (the same script in every add-on window).
+-- SP_ADDON_SWITCH exp_tracker
+-- SP_ADDON_SWITCH weapon_refresh
+-- SP_ADDON_SWITCH weapon_slot
+-- SP_ADDON_SWITCH hud_move
+-- SP_ADDON_SWITCH ui_fixes
+-- An add-on counts as installed while its marker file
+-- Data/ui/sp_addons/<key>.txt exists. The launcher copies the marker in with
+-- the add-on and takes it out again with it, so a window that several add-ons
+-- share only runs the parts of the add-ons that are installed.
+-- The on/off switches are in Options > UI > Add-ons and are saved in
+-- sp_addons.txt (the Ice UI uses the same file; nobody removes anyone else's
+-- lines). This window reads it every 2 seconds. Everything is on by default.
+pcall(function()
+    local BODY = 'hud'
+    -- key, class put on this window while that add-on is off or not installed ('' = none)
+    local MINE = {{'exp_tracker', 'sp-exp-off'}, {'weapon_refresh', ''}, {'weapon_slot', ''}, {'hud_move', ''}, {'ui_fixes', ''}}
+    local installed = {}
+    SP_ADDON_INSTALLED = function(key)
+        -- the Steampunk UI theme has every add-on built in
+        if SP_THEME == 'steampunk' then return true end
+        if installed[key] == nil then
+            installed[key] = true      -- if the game won't let the UI read files, assume installed
+            pcall(function()
+                local f = io.open('Data/ui/sp_addons/' .. key .. '.txt', 'r')
+                if f then f:close() else installed[key] = false end
+            end)
+        end
+        return installed[key]
+    end
+    local flags = {}
+    local function read_flags()
+        flags = {}
+        pcall(function()
+            local f = io.open('sp_addons.txt', 'r')
+            if not f then return end
+            for line in f:lines() do
+                local k, v = line:match('^%s*([%w_]+)%s*=%s*(%d)')
+                if k then flags[k] = v end
+            end
+            f:close()
+        end)
+    end
+    -- SP_ADDON_ON(key): installed and not switched off. Reads the switches fresh
+    -- unless called with fresh == false.
+    SP_ADDON_ON = function(key, fresh)
+        if not SP_ADDON_INSTALLED(key) then return false end
+        if fresh ~= false then read_flags() end
+        return flags[key] ~= '0'
+    end
+    local doc = document
+    local function apply()
+        read_flags()
+        for _, m in ipairs(MINE) do
+            local on = SP_ADDON_ON(m[1], false)
+            if m[2] ~= '' then pcall(function() (doc:GetElementById(BODY) or doc):SetClass(m[2], not on) end) end
+            -- a script in this window can register SP_ADDON_HOOK['<key>@<body id>'] = function(on) ... end
+            local hook = SP_ADDON_HOOK and SP_ADDON_HOOK[m[1] .. '@' .. BODY]
+            if hook then pcall(hook, on) end
+        end
+    end
+    apply()
+    doc:AddEventListener('show', function() pcall(apply) end)
+    doc:AddEventListener('mouseover', function() pcall(apply) end)
+    -- repeating 2 second check: two identical animations swapped each time one ends
+    pcall(function()
+        local timer = doc:GetElementById('sp-switch-timer')   -- the empty div at the end of the body
+        local flip = false
+        timer:AddEventListener('animationend', function()
+            pcall(apply)
+            flip = not flip
+            timer.style.animation = '2s ' .. (flip and 'sp-switch-tick-b' or 'sp-switch-tick-a')
+        end)
+    end)
+end)
+    </script>
+	</head>
+
+	<body id="hud" onclick="self-target">
+		<!-- ===== Default UI HUD (taken out at load when Steampunk is installed) ===== -->
+		<handle data-model="character" class="window-title sp-only-default" style="cursor: default" id="window-title-text">{{name}}</handle>
+		<div class="container sp-only-default">
+			<div class="hud" data-model="character">
+				<div class="window-fixed-size">
+					<div id="window-content" class="content">
+						<!-- HP Gauge -->
+						<gauge id="health" class="horizontal-lg-lg red"
+							data-class-low-value-animation="health_percent &lt;= 20"
+							data-attr-gvalue="health"
+							data-attr-gmax="max_health">
+							<template src="gauge-info-vmp" />
+						</gauge>
+
+						<!-- MP Gauge -->
+						<gauge id="mana" class="horizontal-lg-lg blue"
+							data-class-low-value-animation="mana_percent &lt;= 20"
+							data-attr-gvalue="mana"
+							data-attr-gmax="max_mana">
+							<template src="gauge-info-vmp" />
+						</gauge>
+
+						<!-- Exp Gauge (wrapped for the EXP Tracker tooltip) -->
+						<span id="sp-track" data-attr-sp-name="name" data-attr-sp-lv="level" data-attr-sp-exp="experience" data-attr-sp-max="max_experience" data-attr-sp-money="money"></span>
+						<div id="sp-exp-wrap">
+						<gauge id="exp" class="horizontal-sm-lg yellow" data-attr-gvalue="experience"
+							data-attr-gmax="max_experience">
+							<span class="marker">
+								<img sprite="gauge-bg-sm-lg-markers" />
+							</span>
+							<span class="exp-text">
+								<label id="percent" />%
+							</span>
+						</gauge>
+						<!-- Covers the bar so the game's own small EXP tooltip doesn't open as well -->
+						<div id="sp-exp-cover"></div>
+						<div class="sp-tip">
+							<span class="sp-tip-title">Experience</span>
+							<span class="sp-tip-row">{{experience}} / {{max_experience}}</span>
+							<span class="sp-tip-row" id="sp-xp-rate">Per hour: gathering data...</span>
+							<span class="sp-tip-row" id="sp-xp-eta"></span>
+							<span class="sp-tip-row" id="sp-xp-session"></span>
+							<span class="sp-tip-note">Double-click the EXP bar to start a new session.</span>
+						</div>
+						</div>
+					</div>
+					<!-- Movable HUD add-on: hold the footer to move the HUD (does nothing while that add-on isn't installed) -->
+					<handle class="sp-move" move_target="#document">
+						<div class="footer">
+							<span class="left">
+								<span class="level">{{level}} </span>
+								<span class="job">
+									<str data-attr-job-name="job">Visitor</str>
+								</span>
+							</span>
+							<span class="right">
+								<str string-id="107">Weight</str>: <b class="weight">{{weight_percent}}%</b>
+							</span>
+						</div>
+					</handle>
+				</div>
+			</div>
+
+			<!-- HUD Weapon Slot add-on: weapon / ammo slot (hidden while that add-on isn't installed) -->
+			<div class="weapon-slot sp-wslot" data-model="inventory">
+				<span id="sp-weapon-src" data-attr-sp-key="equipped_weapon.key" data-attr-sp-dur="equipped_weapon.durability" data-attr-sp-life="equipped_weapon.life"></span>
+				<img sprite="GEN_INVSLOT08"
+					data-if="equipped_weapon.id == 0 &amp;&amp; equipped_shot_item.id == 0" />
+
+				<item-slot id="sp-weapon-slot" data-if="equipped_shot_item.id == 0"
+					data-attr-item-key="equipped_weapon.key"
+					data-attr-item-id="equipped_weapon.id"
+					data-attr-item-type="equipped_weapon.type"
+					data-attr-item-quantity="equipped_weapon.quantity"
+					data-attr-item-refine-grade="equipped_weapon.refine_grade"
+					data-attr-item-life="equipped_weapon.life"
+					data-attr-item-durability="equipped_weapon.durability"
+					data-attr-item-appraisal="equipped_weapon.appraisal_no"
+					data-attr-item-refine-color="equipped_weapon.refine_color" />
+
+				<item-slot data-if="equipped_shot_item.id != 0"
+					data-attr-item-key="equipped_shot_item.key"
+					data-attr-item-id="equipped_shot_item.id"
+					data-attr-item-type="equipped_shot_item.type"
+					data-attr-item-quantity="equipped_shot_item.quantity" />
+			</div>
+
+			<!-- PAT Fuel -->
+			<div onclick="ignore" data-model="pat">
+				<div class="pat-fuel">
+					<gauge data-if="show" id="fuel" class="horizontal-sm-md green" data-attr-gvalue="fuel"
+						data-attr-gmax="max_fuel">
+						<span>
+							<label id="percent" />%
+						</span>
+					</gauge>
+				</div>
+			</div>
+		</div>
+
+		<!-- State Icons -->
+		<div class="sp-only-default" id="state-icon-container" onclick="ignore" data-model="hud-statuses">
+			<div class="hud-status-row" data-for="group : groups" data-if="group.statuses.size > 0">
+				<span class="hud-status-icon" data-for="status : group.statuses" data-class-blink="status.blink" data-class-inactive="!status.active" data-class-warning="status.is_warning" data-attr-hud-status="status.index">
+					<img data-attr-sprite="status.sprite"/>
+				</span>
+			</div>
+		</div>
+	
+		<!-- ===== Steampunk HUD (taken out at load with the default UI) ===== -->
+
+		<!-- Everything inside .sp-hud moves together when the drag bar is held -->
+		<div class="sp-hud sp-only-steampunk" id="sp-hud">
+
+			<!-- Character plate -->
+			<div class="sp-plate" data-model="character">
+				<span id="sp-track" data-attr-sp-name="name" data-attr-sp-lv="level" data-attr-sp-exp="experience" data-attr-sp-max="max_experience" data-attr-sp-money="money"></span>
+				<div class="sp-title">
+					<span class="sp-name">{{name}}</span>
+					<span class="sp-job"><span class="sp-level">Lv {{level}}</span><str data-attr-job-name="job">Visitor</str></span>
+				</div>
+
+				<div class="sp-bars">
+					<div class="sp-gauge">
+						<div class="sp-cap left"></div>
+						<gauge id="health" class="horizontal-lg-lg red" data-class-low-value-animation="health_percent &lt;= 20" data-attr-gvalue="health" data-attr-gmax="max_health">
+							<template src="gauge-info-vmp" />
+						</gauge>
+						<div class="sp-cap right"></div>
+						<div class="sp-tip">
+							<span class="sp-tip-title">HP</span>
+							<span class="sp-tip-row">{{health}} / {{max_health}} ({{health_percent}}%)</span>
+							<span class="sp-tip-row">Recovery {{health_recovery}}</span>
+						</div>
+					</div>
+
+					<div class="sp-gauge">
+						<div class="sp-cap left"></div>
+						<gauge id="mana" class="horizontal-lg-lg blue" data-class-low-value-animation="mana_percent &lt;= 20" data-attr-gvalue="mana" data-attr-gmax="max_mana">
+							<template src="gauge-info-vmp" />
+						</gauge>
+						<div class="sp-cap right"></div>
+						<div class="sp-tip">
+							<span class="sp-tip-title">MP</span>
+							<span class="sp-tip-row">{{mana}} / {{max_mana}} ({{mana_percent}}%)</span>
+							<span class="sp-tip-row">Recovery {{mana_recovery}}</span>
+						</div>
+					</div>
+
+					<div class="sp-gauge exp">
+						<div class="sp-cap left"></div>
+						<gauge id="exp" class="horizontal-sm-lg yellow" data-attr-gvalue="experience" data-attr-gmax="max_experience">
+							<span class="marker"><img sprite="gauge-bg-sm-lg-markers" /></span>
+							<span class="exp-text"><label id="percent" />%</span>
+						</gauge>
+						<div class="sp-cap right"></div>
+						<div class="sp-tip">
+							<span class="sp-tip-title">Experience</span>
+							<span class="sp-tip-row">{{experience}} / {{max_experience}}</span>
+							<span class="sp-tip-row" id="sp-xp-rate">Per hour: gathering data...</span>
+							<span class="sp-tip-row" id="sp-xp-eta"></span>
+							<span class="sp-tip-row" id="sp-xp-session"></span>
+							<span class="sp-tip-warn" data-if="experience_gain_disabled">Experience gain is turned off</span>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Weapon / ammo slot (its own data model, so it sits beside the plate, not inside it) -->
+			<div class="weapon-slot" data-model="inventory">
+				<span id="sp-weapon-src" data-attr-sp-key="equipped_weapon.key" data-attr-sp-dur="equipped_weapon.durability" data-attr-sp-life="equipped_weapon.life"></span>
+				<img sprite="GEN_INVSLOT08"
+					data-if="equipped_weapon.id == 0 &amp;&amp; equipped_shot_item.id == 0" />
+
+				<item-slot id="sp-weapon-slot" data-if="equipped_shot_item.id == 0"
+					data-attr-item-key="equipped_weapon.key"
+					data-attr-item-id="equipped_weapon.id"
+					data-attr-item-type="equipped_weapon.type"
+					data-attr-item-quantity="equipped_weapon.quantity"
+					data-attr-item-refine-grade="equipped_weapon.refine_grade"
+					data-attr-item-life="equipped_weapon.life"
+					data-attr-item-durability="equipped_weapon.durability"
+					data-attr-item-appraisal="equipped_weapon.appraisal_no"
+					data-attr-item-refine-color="equipped_weapon.refine_color"
+					data-attr-item-slot="equipped_weapon.slot"
+					data-attr-item-appraised="equipped_weapon.appraised"
+					data-attr-item-socket-count="equipped_weapon.socket_count"
+					data-attr-item-gem="equipped_weapon.gem_no"
+					data-attr-item-gem-no="equipped_weapon.gem_no"
+					data-attr-item-gem-option3="equipped_weapon.gem_option3" />
+
+				<item-slot data-if="equipped_shot_item.id != 0"
+					data-attr-item-key="equipped_shot_item.key"
+					data-attr-item-id="equipped_shot_item.id"
+					data-attr-item-type="equipped_shot_item.type"
+					data-attr-item-quantity="equipped_shot_item.quantity" />
+			</div>
+
+			<!-- Drag bar: hold and drag to move the whole HUD -->
+			<handle class="sp-drag" move_target="#document" data-model="character">
+				<div class="sp-footer">
+					<span><str string-id="107">Weight</str>: <b>{{weight_percent}}%</b></span>
+					<span class="sp-zulie" id="sp-zulie"><b>{{money | format_number}}</b><img sprite="button-zulie-n" />
+						<div class="sp-tip">
+							<span class="sp-tip-title">Zulie this session</span>
+							<span class="sp-tip-row" id="sp-zuly-session">Gathering data...</span>
+							<span class="sp-tip-row" id="sp-zuly-rate"></span>
+							<span class="sp-tip-row" id="sp-zuly-time"></span>
+							<span class="sp-tip-note">Double-click the Zulie to start a new session.</span>
+						</div>
+					</span>
+				</div>
+			</handle>
+
+			<!-- PAT Fuel -->
+			<div onclick="ignore" data-model="pat">
+				<div class="pat-fuel">
+					<gauge data-if="show" id="fuel" class="horizontal-sm-md green" data-attr-gvalue="fuel"
+						data-attr-gmax="max_fuel">
+						<span>
+							<label id="percent" />%
+						</span>
+					</gauge>
+				</div>
+			</div>
+		</div>
+
+
+		<!-- State Icons -->
+		<div class="sp-only-steampunk" id="state-icon-container" onclick="ignore" data-model="hud-statuses">
+			<div class="hud-status-row" data-for="group : groups" data-if="group.statuses.size > 0">
+				<span class="hud-status-icon" data-for="status : group.statuses" data-class-blink="status.blink" data-class-inactive="!status.active" data-class-warning="status.is_warning" data-attr-hud-status="status.index">
+					<img data-attr-sprite="status.sprite"/>
+				</span>
+			</div>
+		</div>
+	
+		<div id="sp-track-timer"></div>
+        <div id="sp-switch-timer"></div>
+	</body>
+</rml>

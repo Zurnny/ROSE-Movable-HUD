@@ -1,0 +1,2 @@
+hud_move
+; Marks the Movable HUD add-on as installed. Removed again with the add-on.
