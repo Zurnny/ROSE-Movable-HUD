@@ -405,8 +405,9 @@ end)
 -- Weapon durability refresh (Weapon Refresh add-on). The HUD's weapon slot only
 -- reads the weapon's details when the weapon changes, so durability and life
 -- lost in a fight didn't show (13/13 in the HUD, 12/13 in the inventory).
--- Every 5 seconds this compares the live numbers; when they change it sets the
--- slot's own values again so the slot reloads. Nothing else is touched.
+-- Every 5 seconds this compares the HUD slot with the inventory's weapon cell
+-- (or, when that can't be read, with the live numbers); when they differ it
+-- sets the slot's own values again so the slot reloads. Nothing else is touched.
 pcall(function()
     local document = document
     local last = nil
@@ -420,6 +421,27 @@ pcall(function()
         local dur = src:GetAttribute('sp-dur') or ''
         local life = src:GetAttribute('sp-life') or ''
         local now = key .. '|' .. dur .. '|' .. life
+        -- The game doesn't always update the HUD's copy of the weapon either (the
+        -- inventory said 23/26 while the HUD kept 24/26), so the inventory's own
+        -- weapon cell (item-7) is the first place to look, open or not.
+        local cell = nil
+        pcall(function()
+            local inv = document.context.documents['inventory-window']
+            cell = inv and inv:GetElementById('item-7')
+        end)
+        if cell then
+            local cid, cdur, clife = cell:GetAttribute('item-id'), cell:GetAttribute('item-durability'), cell:GetAttribute('item-life')
+            if cid and cid ~= '' and cid ~= '0' and cid == slot:GetAttribute('item-id') and cdur and cdur ~= '' then
+                if cdur ~= slot:GetAttribute('item-durability') or (clife and clife ~= '' and clife ~= slot:GetAttribute('item-life')) then
+                    slot:SetAttribute('item-durability', cdur)
+                    if clife and clife ~= '' then slot:SetAttribute('item-life', clife) end
+                    slot:SetAttribute('item-key', '0')
+                    slot:SetAttribute('item-key', key)
+                end
+                last = now
+                return
+            end
+        end
         if last and now ~= last and key == last:match('^([^|]*)') and key ~= '' and key ~= '0' then
             slot:SetAttribute('item-durability', dur)
             slot:SetAttribute('item-life', life)
