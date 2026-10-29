@@ -413,39 +413,62 @@ end)
 pcall(function()
     local document = document
     local function el(id) return document:GetElementById(id) end
+    -- the game hands attributes to Lua as numbers or strings; compare and set them as text
+    local function attr(e, k)
+        local v = e:GetAttribute(k)
+        if v == nil then return '' end
+        if type(v) == 'number' and v == math.floor(v) then return string.format('%d', v) end
+        return tostring(v)
+    end
+    local reported = false
     local function sync()
         local sp = SP_THEME == 'steampunk' and '-sp' or ''
         local src, slot = el('sp-weapon-src' .. sp), el('sp-weapon-slot' .. sp)
         if not src or not slot then return end
-        local key = src:GetAttribute('sp-key') or ''
+        local key = attr(src, 'sp-key')
         if key == '' or key == '0' then return end
-        local d, l = src:GetAttribute('sp-dur') or '', src:GetAttribute('sp-life') or ''
+        local d, l = attr(src, 'sp-dur'), attr(src, 'sp-life')
         if not SP_ADDON_ON or SP_ADDON_ON('weapon_refresh') then
             pcall(function()
                 local inv = document.context.documents['inventory-window']
                 local cell = inv and inv:GetElementById('item-7')
-                if cell and cell:GetAttribute('item-key') == key then
-                    local cd, cl = cell:GetAttribute('item-durability'), cell:GetAttribute('item-life')
-                    if cd and cd ~= '' then d = cd end
-                    if cl and cl ~= '' then l = cl end
+                if cell and attr(cell, 'item-key') == key then
+                    local cd, cl = attr(cell, 'item-durability'), attr(cell, 'item-life')
+                    if cd ~= '' then d = cd end
+                    if cl ~= '' then l = cl end
                 end
             end)
         end
-        if slot:GetAttribute('item-durability') ~= d or slot:GetAttribute('item-life') ~= l then
+        if attr(slot, 'item-durability') ~= d or attr(slot, 'item-life') ~= l then
             slot:SetAttribute('item-durability', d)
             slot:SetAttribute('item-life', l)
             -- setting the key again makes the slot read its details (and tooltip) afresh
             slot:SetAttribute('item-key', '0')
             slot:SetAttribute('item-key', key)
+            -- TEMPORARY while testing: note what was set (one line, overwritten each time)
+            pcall(function()
+                local f = io.open('sp_weapon_refresh.txt', 'w')
+                if f then f:write(os.date(), '  key ', key, '  durability ', d, '  life ', l, '  now on slot: ', attr(slot, 'item-life'), '\n'); f:close() end
+            end)
         end
     end
-    pcall(sync)
+    local function run()
+        local ok, err = pcall(sync)
+        if not ok and not reported then
+            reported = true      -- leave a note once, so a problem can be found
+            pcall(function()
+                local f = io.open('sp_weapon_refresh_error.txt', 'w')
+                if f then f:write(os.date(), '  ', tostring(err), '\n'); f:close() end
+            end)
+        end
+    end
+    run()
     for _, id in ipairs({'sp-track-timer', 'sp-switch-timer'}) do
         local timer = el(id)
-        if timer then timer:AddEventListener('animationend', function() pcall(sync) end) end
+        if timer then timer:AddEventListener('animationend', run) end
     end
     local slot0 = el('sp-weapon-slot' .. (SP_THEME == 'steampunk' and '-sp' or ''))
-    if slot0 then slot0:AddEventListener('mouseover', function() pcall(sync) end) end
+    if slot0 then slot0:AddEventListener('mouseover', run) end
 end)
 		</script>
     <script>

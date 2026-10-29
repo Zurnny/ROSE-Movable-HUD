@@ -1,7 +1,7 @@
 ; Update list for Movable HUD. Upload this next to mod.ini and the files folder.
-version=1.6
-c3515a9a50997eecd179b2bd6088d80ccfcb1aea|mod.ini
+version=1.7
+38035276f6d1a566767bd3307af017b8a4fd7491|mod.ini
 f27a64ce0bcc783fb7df6d9c59fcbc82c253a37b|files/Data/ui/sp_addons/hud_move.txt
-da3fba8bb583b6b6deb9b468d655692dc29ca854|files/Data/ui/themes/rose/game/hud.html
+5ec48aceeadd4a2489ba7aa938ad659a2c219edb|files/Data/ui/themes/rose/game/hud.html
 cfe4c3a63e20ee55e3b512b3366654398eafeeed|files/Data/ui/themes/rose/game/options_bgfx.html
 80a26b6252e1b6dde9cd64c23911e2d2adae0d54|files/Data/ui/themes/rose/styles/sp_addons_steampunk_sprites.css
