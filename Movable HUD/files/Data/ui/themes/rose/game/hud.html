@@ -81,17 +81,20 @@
             .sp-theme-steampunk .sp-job { font-size: 12dp; font-weight: 700; line-height: 20dp; color: rgb(201, 180, 138); font-effect: outline(1dp rgb(40, 25, 10)); white-space: nowrap; }
             .sp-theme-steampunk .sp-bars { position: absolute; left: 14dp; top: 34dp; width: 162dp; }
             .sp-theme-steampunk .sp-gauge { position: relative; display: flex; flex-direction: row; align-items: center; height: 18dp; margin-bottom: 4dp; }
-            .sp-theme-steampunk .sp-cap { width: 7dp; height: 18dp; flex-shrink: 0; }
-            .sp-theme-steampunk .sp-cap.left { decorator: image(sp-cap-l); }
-            .sp-theme-steampunk .sp-cap.right { decorator: image(sp-cap-r); }
-            .sp-theme-steampunk .sp-track-sp { position: relative; flex: 1; height: 14dp; display: flex; flex-direction: row; justify-content: center; align-items: center; decorator: tiled-horizontal(sp-track-l, sp-track-c, sp-track-r); }
+            .sp-theme-steampunk .sp-cap { position: relative; z-index: 1; width: 10dp; height: 18dp; flex-shrink: 0; }
+            .sp-theme-steampunk .sp-cap.left { decorator: image(sp-cap-l); margin-right: -3dp; }
+            .sp-theme-steampunk .sp-cap.right { decorator: image(sp-cap-r); margin-left: -3dp; }
             .sp-theme-steampunk .sp-gauge gauge { flex: 0 0 auto; width: 148dp; height: 18dp; }
+            .sp-theme-steampunk .sp-gauge gauge > span.ginner { box-sizing: border-box; width: 100%; padding: 0 6dp; }
+            .sp-theme-steampunk .sp-gauge gauge span.gauge-left { font-size: 0.92em; }
+            .sp-theme-steampunk .sp-gauge gauge span.gauge-right { font-size: 0.92em; }
             .sp-theme-steampunk .sp-gauge.exp gauge { width: 150dp; height: 11dp; }
             .sp-theme-steampunk #exp { position: relative; }
             .sp-theme-steampunk #exp > span.exp-text { position: absolute; left: 0dp; top: 0dp; width: 100%; height: 11dp; line-height: 11dp; text-align: center; font-size: 11dp; font-weight: 800; color: rgb(255, 255, 255); font-effect: outline(1dp black); pointer-events: none; }
             .sp-theme-steampunk .sp-gauge.exp { height: 14dp; margin-bottom: 0; }
-            .sp-theme-steampunk .sp-gauge.exp .sp-cap { width: 6dp; height: 14dp; }
-            .sp-theme-steampunk .sp-gauge.exp .sp-track-sp { height: 11dp; }
+            .sp-theme-steampunk .sp-gauge.exp .sp-cap { width: 9dp; height: 14dp; }
+            .sp-theme-steampunk .sp-gauge.exp .sp-cap.left { decorator: image(sp-cap-exp-l); }
+            .sp-theme-steampunk .sp-gauge.exp .sp-cap.right { decorator: image(sp-cap-exp-r); }
             .sp-theme-steampunk .weapon-slot { position: absolute; left: 181dp; top: 36dp; width: 55dp; height: 55dp; decorator: image(sp-slot); }
             .sp-theme-steampunk .weapon-slot > img { pointer-events: none; }
             .sp-theme-steampunk .weapon-slot > item-slot { position: absolute; left: 3dp; top: 3dp; width: 49dp; height: 49dp; }

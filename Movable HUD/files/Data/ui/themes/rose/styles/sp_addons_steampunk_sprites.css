@@ -18,8 +18,10 @@
     sp-frame-b: 132px 32px 1px 16px;
     sp-frame-br: 140px 32px 16px 16px;
     sp-rivet: 160px 0px 10px 10px;
-    sp-cap-l: 172px 0px 10px 22px;
-    sp-cap-r: 184px 0px 10px 22px;
+    sp-cap-l: 296px 0px 20px 36px;      /* bar end caps (wide flange), drawn at 2x */
+    sp-cap-r: 320px 0px 20px 36px;
+    sp-cap-exp-l: 344px 0px 18px 28px;
+    sp-cap-exp-r: 366px 0px 18px 28px;
     sp-badge: 196px 0px 44px 22px;
     sp-track-l: 244px 0px 1px 16px;
     sp-track-c: 260px 0px 1px 16px;
