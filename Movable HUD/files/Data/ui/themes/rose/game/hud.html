@@ -74,7 +74,6 @@
             .sp-theme-default .sp-tip-note { display: block; color: rgb(180, 180, 180); font-size: 11dp; line-height: 15dp; }
 
             /* ==== Steampunk look only ==== */
-            body.sp-theme-steampunk { margin: 5dp; }
             .sp-theme-steampunk .sp-hud { position: relative; width: 248dp; height: 126dp; }
             .sp-theme-steampunk .sp-plate { position: absolute; left: 0; top: 0; width: 248dp; height: 126dp; decorator: tiled-box( sp-frame-tl, sp-frame-t, sp-frame-tr, sp-frame-l, sp-frame-c, sp-frame-r, sp-frame-bl, sp-frame-b, sp-frame-br ); font-family: Nunito; color: rgb(241, 227, 196); }
             .sp-theme-steampunk .sp-title { position: absolute; left: 14dp; top: 8dp; width: 220dp; height: 20dp; display: flex; flex-direction: row; justify-content: space-between; align-items: center; }
@@ -86,21 +85,13 @@
             .sp-theme-steampunk .sp-cap.left { decorator: image(sp-cap-l); }
             .sp-theme-steampunk .sp-cap.right { decorator: image(sp-cap-r); }
             .sp-theme-steampunk .sp-track-sp { position: relative; flex: 1; height: 14dp; display: flex; flex-direction: row; justify-content: center; align-items: center; decorator: tiled-horizontal(sp-track-l, sp-track-c, sp-track-r); }
-            .sp-theme-steampunk .sp-fill { position: absolute; left: 0; top: 1dp; height: 13dp; decorator: image(sp-glare); }
-            .sp-theme-steampunk .sp-fill.hp { background-color: rgb(184, 70, 30); }
-            .sp-theme-steampunk .sp-fill.mp { background-color: rgb(63, 138, 116); }
-            .sp-theme-steampunk .sp-gauge-text { display: block; position: relative; top: 2dp; flex: 0 0 auto; white-space: nowrap; text-align: center; font-size: 12dp; line-height: 14dp; font-weight: 800; color: rgb(255, 244, 224); font-effect: outline(1dp black); }
-            .sp-theme-steampunk .sp-gauge-text.low { animation: 1.5s cubic-in-out infinite alternate sp-low; }
             .sp-theme-steampunk .sp-gauge gauge { flex: 0 0 auto; width: 148dp; height: 18dp; }
             .sp-theme-steampunk .sp-gauge.exp gauge { width: 150dp; height: 11dp; }
-            .sp-theme-steampunk gauge.low-value-animation { animation: 1.5s cubic-in-out infinite alternate low; }
             .sp-theme-steampunk #exp { position: relative; }
             .sp-theme-steampunk #exp > span.exp-text { position: absolute; left: 0dp; top: 0dp; width: 100%; height: 11dp; line-height: 11dp; text-align: center; font-size: 11dp; font-weight: 800; color: rgb(255, 255, 255); font-effect: outline(1dp black); pointer-events: none; }
             .sp-theme-steampunk .sp-gauge.exp { height: 14dp; margin-bottom: 0; }
             .sp-theme-steampunk .sp-gauge.exp .sp-cap { width: 6dp; height: 14dp; }
             .sp-theme-steampunk .sp-gauge.exp .sp-track-sp { height: 11dp; }
-            .sp-theme-steampunk .sp-fill.exp { top: 1dp; height: 10dp; background-color: rgb(217, 176, 106); }
-            .sp-theme-steampunk .sp-gauge.exp .sp-gauge-text { top: 1dp; font-size: 10dp; line-height: 11dp; }
             .sp-theme-steampunk .weapon-slot { position: absolute; left: 181dp; top: 36dp; width: 55dp; height: 55dp; decorator: image(sp-slot); }
             .sp-theme-steampunk .weapon-slot > img { pointer-events: none; }
             .sp-theme-steampunk .weapon-slot > item-slot { position: absolute; left: 3dp; top: 3dp; width: 49dp; height: 49dp; }
@@ -112,22 +103,14 @@
             .sp-theme-steampunk .sp-zulie img { width: 14dp; height: 14dp; }
             .sp-theme-steampunk .pat-fuel { position: absolute; left: 254dp; top: 101dp; }
             .sp-theme-steampunk #state-icon-container { margin-top: 5dp; width: 248dp; }
-            .sp-theme-steampunk .hud-status-row { display: flex; flex-wrap: wrap; }
-            .sp-theme-steampunk .hud-status-icon { display: inline-block; width: 20dp; height: 20dp; margin: 0 1dp 1dp 0; flex-shrink: 0; }
-            .sp-theme-steampunk .hud-status-icon img { width: 20dp; height: 20dp; pointer-events: none; }
-            .sp-theme-steampunk .hud-status-icon.blink { opacity: 0.25; }
-            .sp-theme-steampunk .hud-status-icon.inactive img { image-color: rgb(255, 0, 0); }
-            .sp-theme-steampunk .hud-status-icon.warning img { image-color: rgb(255, 180, 180); }
             .sp-theme-steampunk .sp-tip { position: absolute; left: 0; top: 100%; z-index: 10; width: 182dp; margin-top: 3dp; padding: 4dp 6dp; background: rgba(226, 208, 170, 245); border: 1dp rgb(122, 86, 36); border-radius: 1dp; color: rgb(60, 40, 20); font-size: 13dp; line-height: 18dp; font-weight: 700; font-effect: none; text-align: left; visibility: hidden; pointer-events: none; }
             .sp-theme-steampunk .sp-gauge:hover .sp-tip { visibility: visible; }
             .sp-theme-steampunk .sp-level { color: rgb(243, 211, 138); font-weight: 800; margin-right: 5dp; }
             .sp-theme-steampunk .sp-tip-title { display: block; font-weight: 800; color: rgb(90, 50, 15); border-bottom: 1dp rgb(161, 124, 72); margin-bottom: 2dp; }
-            .sp-theme-steampunk .sp-tip-row { display: block; }
             .sp-theme-steampunk .sp-tip-warn { display: block; color: rgb(170, 50, 30); }
             .sp-theme-steampunk .sp-tip-note { display: block; color: rgb(120, 86, 46); font-size: 11dp; line-height: 15dp; font-weight: 600; }
             .sp-theme-steampunk #sp-track-sp { display: none; }
             .sp-theme-steampunk #sp-weapon-src-sp { display: none; }
-            .sp-theme-steampunk #sp-track-timer { position: absolute; width: 1dp; height: 1dp; opacity: 0; animation: 5s sp-track-tick-a; }
             .sp-theme-steampunk .sp-zulie { position: relative; pointer-events: auto; cursor: hand; }
             .sp-theme-steampunk .sp-zulie .sp-tip { left: auto; right: -6dp; width: 196dp; margin-top: 4dp; }
             .sp-theme-steampunk .sp-zulie:hover .sp-tip { visibility: visible; }
@@ -145,11 +128,6 @@
             @keyframes sp-track-tick-b { from { opacity: 0; } to { opacity: 0; } }
             @keyframes sp-switch-tick-a { from { opacity: 0; } to { opacity: 0; } }
             @keyframes sp-switch-tick-b { from { opacity: 0; } to { opacity: 0; } }
-            @keyframes sp-low
-			{
-				from { color: rgb(255, 80, 60); }
-				to   { color: rgb(255, 244, 224); }
-			}
         </style>
         <script>
 -- Theme check (add-on windows work with the default UI and with the Steampunk
