@@ -402,64 +402,50 @@ pcall(function()
 end)
 		</script>
 		<script>
--- Weapon durability refresh (Weapon Refresh add-on). The HUD's weapon slot only
--- reads the weapon's details when the weapon changes, so durability and life
--- lost in a fight didn't show (24/26 in the HUD, 23/26 in the inventory).
--- The slot is reloaded (its item-key set again) when the numbers change, once
--- more 5 seconds later (the game's copy can lag behind by one hit), and every
--- time the mouse goes over it, so its tooltip is always fresh. Nothing else is touched.
+-- Weapon durability refresh (Weapon Refresh add-on). The game fills in the
+-- HUD's copy of the weapon (equipped_weapon) only when the HUD loads, so
+-- durability lost in a fight never showed there (24/26 in the HUD, 23/26 in the
+-- inventory). The inventory's own weapon cell (item-7) does get the live
+-- numbers, so this copies durability and life from it into the HUD slot, which
+-- is not bound to equipped_weapon for those two. Checked every 2 and 5 seconds
+-- and whenever the mouse goes over the slot. Without the inventory (or with
+-- Weapon Refresh off) the slot shows the HUD's own numbers, as the game does.
 pcall(function()
     local document = document
-    local last, again = nil, false
     local function el(id) return document:GetElementById(id) end
-    local function parts()
+    local function sync()
         local sp = SP_THEME == 'steampunk' and '-sp' or ''
         local src, slot = el('sp-weapon-src' .. sp), el('sp-weapon-slot' .. sp)
-        if not src or not slot then return nil end
-        if SP_ADDON_ON and not SP_ADDON_ON('weapon_refresh') then return nil end
-        return src, slot
-    end
-    local function reload(src, slot)
+        if not src or not slot then return end
         local key = src:GetAttribute('sp-key') or ''
         if key == '' or key == '0' then return end
-        -- take durability and life from the inventory's own weapon cell when it has them
-        pcall(function()
-            local inv = document.context.documents['inventory-window']
-            local cell = inv and inv:GetElementById('item-7')
-            if cell and cell:GetAttribute('item-id') == slot:GetAttribute('item-id') then
-                local d, l = cell:GetAttribute('item-durability'), cell:GetAttribute('item-life')
-                if d and d ~= '' then slot:SetAttribute('item-durability', d) end
-                if l and l ~= '' then slot:SetAttribute('item-life', l) end
-            end
-        end)
-        slot:SetAttribute('item-key', '0')
-        slot:SetAttribute('item-key', key)
-    end
-    local function check()
-        local src, slot = parts()
-        if not src then last = nil; return end
-        local key = src:GetAttribute('sp-key') or ''
-        local now = key .. '|' .. (src:GetAttribute('sp-dur') or '') .. '|' .. (src:GetAttribute('sp-life') or '')
-        if again then again = false; reload(src, slot) end
-        if last and now ~= last and key == last:match('^([^|]*)') then
-            reload(src, slot)
-            again = true
+        local d, l = src:GetAttribute('sp-dur') or '', src:GetAttribute('sp-life') or ''
+        if not SP_ADDON_ON or SP_ADDON_ON('weapon_refresh') then
+            pcall(function()
+                local inv = document.context.documents['inventory-window']
+                local cell = inv and inv:GetElementById('item-7')
+                if cell and cell:GetAttribute('item-key') == key then
+                    local cd, cl = cell:GetAttribute('item-durability'), cell:GetAttribute('item-life')
+                    if cd and cd ~= '' then d = cd end
+                    if cl and cl ~= '' then l = cl end
+                end
+            end)
         end
-        last = now
+        if slot:GetAttribute('item-durability') ~= d or slot:GetAttribute('item-life') ~= l then
+            slot:SetAttribute('item-durability', d)
+            slot:SetAttribute('item-life', l)
+            -- setting the key again makes the slot read its details (and tooltip) afresh
+            slot:SetAttribute('item-key', '0')
+            slot:SetAttribute('item-key', key)
+        end
     end
-    local timer = el('sp-track-timer')
-    if timer then
-        timer:AddEventListener('animationend', function() pcall(check) end)
+    pcall(sync)
+    for _, id in ipairs({'sp-track-timer', 'sp-switch-timer'}) do
+        local timer = el(id)
+        if timer then timer:AddEventListener('animationend', function() pcall(sync) end) end
     end
     local slot0 = el('sp-weapon-slot' .. (SP_THEME == 'steampunk' and '-sp' or ''))
-    if slot0 then
-        slot0:AddEventListener('mouseover', function()
-            pcall(function()
-                local src, slot = parts()
-                if src then reload(src, slot) end
-            end)
-        end)
-    end
+    if slot0 then slot0:AddEventListener('mouseover', function() pcall(sync) end) end
 end)
 		</script>
     <script>
@@ -632,8 +618,7 @@ end)
 					data-attr-item-type="equipped_weapon.type"
 					data-attr-item-quantity="equipped_weapon.quantity"
 					data-attr-item-refine-grade="equipped_weapon.refine_grade"
-					data-attr-item-life="equipped_weapon.life"
-					data-attr-item-durability="equipped_weapon.durability"
+					item-life="0" item-durability="0"
 					data-attr-item-appraisal="equipped_weapon.appraisal_no"
 					data-attr-item-refine-color="equipped_weapon.refine_color" />
 
@@ -737,8 +722,7 @@ end)
 					data-attr-item-type="equipped_weapon.type"
 					data-attr-item-quantity="equipped_weapon.quantity"
 					data-attr-item-refine-grade="equipped_weapon.refine_grade"
-					data-attr-item-life="equipped_weapon.life"
-					data-attr-item-durability="equipped_weapon.durability"
+					item-life="0" item-durability="0"
 					data-attr-item-appraisal="equipped_weapon.appraisal_no"
 					data-attr-item-refine-color="equipped_weapon.refine_color"
 					data-attr-item-slot="equipped_weapon.slot"
