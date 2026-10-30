@@ -547,7 +547,7 @@ end)
 	</head>
 
 	<body id="hud" onclick="self-target">
-		<!-- ===== Default UI HUD (taken out at load when Steampunk is installed) ===== -->
+		<!-- ===== Default UI HUD (hidden when Steampunk is installed) ===== -->
 		<handle data-model="character" class="window-title sp-only-default" style="cursor: default" id="window-title-text">{{name}}</handle>
 		<div class="container sp-only-default">
 			<div class="hud" data-model="character">
@@ -646,16 +646,9 @@ end)
 			</div>
 		</div>
 
-		<!-- State Icons -->
-		<div class="sp-only-default" id="state-icon-container" onclick="ignore" data-model="hud-statuses">
-			<div class="hud-status-row" data-for="group : groups" data-if="group.statuses.size > 0">
-				<span class="hud-status-icon" data-for="status : group.statuses" data-class-blink="status.blink" data-class-inactive="!status.active" data-class-warning="status.is_warning" data-attr-hud-status="status.index">
-					<img data-attr-sprite="status.sprite"/>
-				</span>
-			</div>
-		</div>
+
 	
-		<!-- ===== Steampunk HUD (taken out at load with the default UI) ===== -->
+		<!-- ===== Steampunk HUD (hidden with the default UI) ===== -->
 
 		<!-- Everything inside .sp-hud moves together when the drag bar is held -->
 		<div class="sp-hud sp-only-steampunk" id="sp-hud">
@@ -773,15 +766,17 @@ end)
 		</div>
 
 
+
+	
+		<!-- ===== Both looks ===== -->
 		<!-- State Icons -->
-		<div class="sp-only-steampunk" id="state-icon-container" onclick="ignore" data-model="hud-statuses">
+		<div id="state-icon-container" onclick="ignore" data-model="hud-statuses">
 			<div class="hud-status-row" data-for="group : groups" data-if="group.statuses.size > 0">
 				<span class="hud-status-icon" data-for="status : group.statuses" data-class-blink="status.blink" data-class-inactive="!status.active" data-class-warning="status.is_warning" data-attr-hud-status="status.index">
 					<img data-attr-sprite="status.sprite"/>
 				</span>
 			</div>
 		</div>
-	
 		<div id="sp-track-timer"></div>
         <div id="sp-switch-timer"></div>
 	</body>
