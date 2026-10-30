@@ -192,7 +192,7 @@ end
 -- Chat message colours (Message Colours add-on). Shared by options_bgfx.html (the
 -- picker) and chat_box.html (the messages). Written inline because the game
 -- ignores edited .lua files. Choices are saved to sp_chat_colors.txt.
-local CHANNELS = {{id='chat', name='Chat', default='rgb(255, 255, 255)'}, {id='shout', name='Shout', default='rgb(255, 105, 105)'}, {id='whisper', name='Whisper', default='rgb(255, 158, 232)'}, {id='trade', name='Trade', default='rgb(0, 210, 50)'}, {id='party', name='Party', default='rgb(189, 250, 255)'}, {id='clan', name='Clan', default='rgb(255, 228, 122)'}, {id='group', name='Group', default='rgb(156, 175, 243)'}, {id='quest', name='Quest', default='rgb(151, 221, 241)'}, {id='system', name='System', default='rgb(255, 224, 229)'}}
+local CHANNELS = {{id='chat', name='Chat', default='rgb(255, 255, 255)'}, {id='shout', name='Shout', default='rgb(255, 105, 105)'}, {id='whisper', name='Whisper', default='rgb(255, 158, 232)'}, {id='trade', name='Trade', default='rgb(0, 210, 50)'}, {id='party', name='Party', default='rgb(189, 250, 255)'}, {id='clan', name='Clan', default='rgb(255, 228, 122)'}, {id='group', name='Group', default='rgb(156, 175, 243)'}, {id='leader', name='Group Leader', default='rgb(87, 124, 221)'}, {id='quest', name='Quest', default='rgb(151, 221, 241)'}, {id='system', name='System', default='rgb(255, 224, 229)'}}
 local PALETTE = {{name='White', rgb='rgb(255, 255, 255)'}, {name='Parchment', rgb='rgb(226, 208, 170)'}, {name='Brass', rgb='rgb(214, 170, 96)'}, {name='Gold', rgb='rgb(255, 215, 90)'}, {name='Copper', rgb='rgb(205, 120, 60)'}, {name='Orange', rgb='rgb(255, 150, 60)'}, {name='Red', rgb='rgb(255, 90, 80)'}, {name='Pink', rgb='rgb(255, 150, 220)'}, {name='Purple', rgb='rgb(190, 150, 255)'}, {name='Blue', rgb='rgb(120, 170, 255)'}, {name='Cyan', rgb='rgb(120, 230, 240)'}, {name='Green', rgb='rgb(110, 220, 110)'}}
 local SAVE_FILE = 'sp_chat_colors.txt'
 local CHAT_ID = 'game-chat-box'
@@ -334,8 +334,6 @@ end)
     
         </script>
         <script>
--- (runs only in the Steampunk look)
-if SP_THEME ~= 'steampunk' then return end
 -- Heading-up minimap switch (steampunk add-on). The minimap window does the
 -- turning; this checkbox tells it to (through _G.SP_MINIMAP_SET) and the choice
 -- is saved in sp_minimap.txt, which the minimap reads when it loads.
@@ -396,20 +394,26 @@ end)
         <script>
 -- Dropped Items: the game's own "Show dropped item name" and "Show item pickup
 -- status" live in Options > Game. These two tick boxes follow them, and ticking
--- one here ticks the game's own, so the game saves it as usual.
+-- one here ticks the game's own once, so the game saves it as usual.
+-- (Setting a tick box from the script counts as a change too, so the script
+-- ignores the changes it makes itself; without that, the two boxes kept
+-- ticking each other and froze the game.)
 pcall(function()
     local document = document
     local PAIRS = {{'sp-item-name', 'item-name'}, {'sp-pickup-status', 'pickup-status'}}
+    local busy = false
     local function options() return document.context and document.context.documents['game-options'] end
     local function sync()
         local o = options()
         if not o then return end
+        busy = true
         for _, p in ipairs(PAIRS) do
             local mine, theirs = document:GetElementById(p[1]), o:GetElementById(p[2])
-            if mine and theirs then
+            if mine and theirs and mine:HasAttribute('checked') ~= theirs:HasAttribute('checked') then
                 if theirs:HasAttribute('checked') then mine:SetAttribute('checked', '') else mine:RemoveAttribute('checked') end
             end
         end
+        busy = false
         local row, names = document:GetElementById('sp-label-row'), o:GetElementById('item-name')
         if row and names then row.style.display = names:HasAttribute('checked') and 'table-row' or 'none' end
     end
@@ -417,12 +421,16 @@ pcall(function()
         local mine = document:GetElementById(p[1])
         if mine then
             mine:AddEventListener('change', function()
+                if busy then return end
                 local o = options()
                 local theirs = o and o:GetElementById(p[2])
                 if theirs and theirs:HasAttribute('checked') ~= mine:HasAttribute('checked') then
+                    busy = true
                     pcall(function() theirs:Click() end)
+                    busy = false
                 end
-                pcall(sync)
+                local row = document:GetElementById('sp-label-row')
+                if row and p[1] == 'sp-item-name' then row.style.display = mine:HasAttribute('checked') and 'table-row' or 'none' end
             end)
         end
     end
@@ -450,13 +458,13 @@ pcall(function()
         {'mob_levels', 'Monster level above monster names', 'Monster Levels', 'combat'},
         {'summon_extras', 'Summon HP, range and low-HP warning', 'Summon Gauge Plus', 'combat'},
         {'exp_tracker', 'EXP per hour when hovering the EXP bar', 'EXP Tracker', 'hud'},
-        {'weapon_slot', 'Weapon slot beside the HUD bars', 'HUD Weapon Slot', 'hud'},
-        {'weapon_refresh', 'Keep the HUD weapon durability up to date', 'Weapon Refresh', 'hud'},
+        {'weapon_slot', 'Weapon slot beside the HUD bars, with its durability kept up to date', 'HUD Weapon Slot', 'hud'},
         {'hud_move', 'Move the HUD by holding its footer', 'Movable HUD', 'hud'},
         {'friend_levels', 'Remembered levels in the friend and group lists', 'Friend Levels', 'social'},
         {'class_icons', 'Class icons in party and group', 'Class Icons', 'social'},
         {'party_buffs', 'Buff icon options in party and group', 'Party Buff Options', 'social'},
         {'craft_max', 'Max button in the crafting window', 'Craft Max', 'items'},
+        {'minimap_compass', 'Compass ring round the minimap', 'Minimap Window', 'map'},
         {'minimap_pad', 'Window under the minimized minimap', 'Minimap Window', 'map'},
     }
     -- add-ons with settings of their own: key, id of those settings, section
@@ -464,6 +472,7 @@ pcall(function()
         {'item_labels', 'sp-sec-item_labels', 'items'},
         {'msg_colors', 'sp-sec-msg_colors', 'chat'},
         {'window_rescue', 'sp-sec-window_rescue', 'map'},
+        {'minimap_compass', 'sp-sec-minimap', 'map'},
     }
     local function el(id) return document:GetElementById(id) end
     local function installed(key)
@@ -593,14 +602,7 @@ end)
                                         <td>Item names</td>
                                         <td>
                                             <input id="sp-item-name" type="checkbox"/>
-                                            <label for="sp-item-name"><str string-id="1367">Show dropped item name</str></label>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>Pickup status</td>
-                                        <td>
-                                            <input id="sp-pickup-status" type="checkbox"/>
-                                            <label for="sp-pickup-status"><str string-id="1371">Show item pickup status</str></label>
+                                            <label for="sp-item-name">Show dropped item names</label>
                                         </td>
                                     </tr>
                                     <!-- Label background slider (script at the end of <head>); shown while item names are on -->
@@ -612,6 +614,13 @@ end)
                                                 <label class="slider-value" id="sp-label-alpha-value">No Lua</label>
                                             </div>
                                             <div id="sp-label-alpha-debug" class="sp-note"></div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Pickup status</td>
+                                        <td>
+                                            <input id="sp-pickup-status" type="checkbox"/>
+                                            <label for="sp-pickup-status">Show item pickup status</label>
                                         </td>
                                     </tr>
                             </tbody>
@@ -631,12 +640,12 @@ end)
                 <details id="sp-cat-map" class="sp-cat" open="">
                     <summary>Map &amp; Windows</summary>
                     <div id="sp-list-map"></div>
-                    <!-- Steampunk only: its minimap settings -->
-    <div class="settings-group sp-only-steampunk">
+                    <!-- Minimap: Steampunk, or the Minimap Window add-on -->
+    <div id="sp-sec-minimap" class="settings-group sp-sec">
                         <h3>Minimap</h3>
                         <table class="main">
                             <tbody>
-                                <!-- Steampunk add-on: heading-up minimap (script at the end of <head>) -->
+                                <!-- heading-up minimap (script at the end of <head>) -->
                                 <tr>
                                     <td>Minimap</td>
                                     <td>
@@ -645,8 +654,8 @@ end)
                                         <div id="sp-mm-status" class="sp-note"></div>
                                     </td>
                                 </tr>
-                                <!-- Steampunk add-on: element chart under the minimized minimap (script at the end of <head>) -->
-                                <tr>
+                                <!-- Steampunk only: element chart under the minimized minimap (script at the end of <head>) -->
+                                <tr class="sp-only-steampunk">
                                     <td></td>
                                     <td>
                                         <input id="sp-el-chart-on" type="checkbox" checked="" />

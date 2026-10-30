@@ -1,11 +1,11 @@
 ; Update list for Movable HUD. Upload this next to mod.ini and the files folder.
-version=1.14
-463dae0df3c3a4302381a96e44ec5874d0622d94|mod.ini
+version=1.15
+e2ddcb04d30bdc53c39d68c0c54386d9277eb0c7|mod.ini
 f27a64ce0bcc783fb7df6d9c59fcbc82c253a37b|files/Data/ui/sp_addons/hud_move.txt
-f6a3ba1a8244385efba3ad63412bae9f81982db4|files/Data/ui/themes/rose/game/hud.html
-f73e3ff2449c21cd26b382a0d965ad68ce2c7387|files/Data/ui/themes/rose/game/menu.html
+d09d2a90b6a9f57cfd378516afbf64f0c5efc93a|files/Data/ui/themes/rose/game/hud.html
+1448712518c250158022e27eee1408bdd42eadec|files/Data/ui/themes/rose/game/menu.html
 4afc0dd827e57b69b5a89fb34676c6c7ec0f575a|files/Data/ui/themes/rose/game/options_bgfx.html
-df14c61c9712375fdda896285ee26c97d7c1ebd0|files/Data/ui/themes/rose/game/sp_addons_window.html
-9b1164d2e102c0a3a8300ea35dc61ec311b3420f|files/Data/ui/themes/rose/imgs/sp_addons_menu.dds
+2d3b3ec1fd292a99466dd3d88e88f41744e0bc45|files/Data/ui/themes/rose/game/sp_addons_window.html
+d49230528a09bf1485a759277d682bf3a6d98230|files/Data/ui/themes/rose/imgs/sp_addons_menu.dds
 c9735755117dd4fa76a010d9d13085fefdd2dfb1|files/Data/ui/themes/rose/styles/sp_addons_steampunk.css
 d91eeca9018f74fcc0129e8769899178111feb8f|files/Data/ui/themes/rose/styles/sp_addons_steampunk_sprites.css

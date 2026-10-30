@@ -409,7 +409,7 @@ pcall(function()
         local key = attr(src, 'sp-key')
         if key == '' or key == '0' then return end
         local d, l = attr(src, 'sp-dur'), attr(src, 'sp-life')
-        if not SP_ADDON_ON or SP_ADDON_ON('weapon_refresh') then
+        if not SP_ADDON_ON or SP_ADDON_ON('weapon_slot') then   -- (Weapon Refresh is part of HUD Weapon Slot now)
             pcall(function()
                 local inv = document.context.documents['inventory-window']
                 local cell = inv and inv:GetElementById('item-7')
@@ -426,11 +426,6 @@ pcall(function()
             -- setting the key again makes the slot read its details (and tooltip) afresh
             slot:SetAttribute('item-key', '0')
             slot:SetAttribute('item-key', key)
-            -- TEMPORARY while testing: note what was set (one line, overwritten each time)
-            pcall(function()
-                local f = io.open('sp_weapon_refresh.txt', 'w')
-                if f then f:write(os.date(), '  key ', key, '  durability ', d, '  life ', l, '  now on slot: ', attr(slot, 'item-life'), '\n'); f:close() end
-            end)
         end
     end
     local function run()
@@ -470,7 +465,6 @@ end)
     <script>
 -- Add-on switches (the same script in every add-on window).
 -- SP_ADDON_SWITCH exp_tracker
--- SP_ADDON_SWITCH weapon_refresh
 -- SP_ADDON_SWITCH weapon_slot
 -- SP_ADDON_SWITCH hud_move
 -- SP_ADDON_SWITCH ui_fixes
@@ -484,7 +478,7 @@ end)
 pcall(function()
     local BODY = 'hud'
     -- key, class put on this window while that add-on is off or not installed ('' = none)
-    local MINE = {{'exp_tracker', 'sp-exp-off'}, {'weapon_refresh', ''}, {'weapon_slot', ''}, {'hud_move', ''}, {'ui_fixes', ''}}
+    local MINE = {{'exp_tracker', 'sp-exp-off'}, {'weapon_slot', ''}, {'hud_move', ''}, {'ui_fixes', ''}}
     local installed = {}
     SP_ADDON_INSTALLED = function(key)
         -- the Steampunk UI theme has every add-on built in
