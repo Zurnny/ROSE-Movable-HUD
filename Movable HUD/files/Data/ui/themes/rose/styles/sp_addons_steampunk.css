@@ -1,0 +1,340 @@
+/* Steampunk look for add-on windows (shared: every add-on ships this same file).
+ * A copy of the Steampunk theme's steampunk.css, with
+ * every rule limited to windows that have the class sp-theme-steampunk (set
+ * when the Steampunk theme is installed). With the default UI nothing here
+ * applies. Made from the Steampunk files by the add-on build; don't edit by hand. */
+
+/* =====================================================================
+ * Steampunk theme overrides
+ * Load this LAST, after every other stylesheet, so it wins.
+ * Only restyles shared pieces: buttons, tabs, sliders, scrollbars,
+ * panels, tooltips, dropped item labels, party/arena overlays.
+ * Delete the <link> to it to go back to the normal look.
+ * ===================================================================== */
+/* ---- Shared text colours (replaces the old bright yellow) ------------ */
+.sp-theme-steampunk .ui-section-title,
+.sp-theme-steampunk .ui-detail-value,
+.sp-theme-steampunk .ui-currency,
+.sp-theme-steampunk .stat-points-row .stat-value,
+.sp-theme-steampunk .currency-value,
+.sp-theme-steampunk .stat-cost,
+.sp-theme-steampunk listbox-item:not([disabled]):hover { color: rgb(243, 211, 138); }
+.sp-theme-steampunk .ui-section-heading,
+.sp-theme-steampunk .ui-footer { border-color: rgb(122, 86, 36); }
+.sp-theme-steampunk .ui-status,
+.sp-theme-steampunk .ui-item-caption,
+.sp-theme-steampunk .stat-label { color: rgb(201, 180, 138); }
+/* ---- Palette (for reference) -----------------------------------------
+ * brass       rgb(214, 170, 96)     dark brass  rgb(122, 86, 36)
+ * copper      rgb(205, 120, 60)     iron        rgb(36, 30, 25)
+ * parchment   rgb(226, 208, 170)    ink         rgb(60, 40, 20)
+ * ------------------------------------------------------------------- */
+/* ---- Panels ---------------------------------------------------------- */
+.sp-theme-steampunk .content-box
+{
+    background: rgba(36, 30, 25, 200);
+    border: 1dp rgb(122, 86, 36);
+    border-radius: 2dp;
+}
+.sp-theme-steampunk .settings-group,
+.sp-theme-steampunk .options-panel details
+{
+    background: rgba(24, 18, 14, 150);
+    border: 1dp rgb(122, 86, 36);
+    border-radius: 2dp;
+}
+.sp-theme-steampunk .settings-group > h3,
+.sp-theme-steampunk .options-panel details > summary > summary-text
+{
+    color: rgb(214, 170, 96);
+    font-effect: outline(1dp rgb(40, 25, 10));
+}
+/* ---- Window frames: riveted brass (art: imgs/steampunk_ui.dds) --------
+ * Needs styles/spritesheet_steampunk.css, which this file imports below
+ * by linking it from each window. Padding is widened slightly so the
+ * content clears the 6dp brass border.
+ * ------------------------------------------------------------------- */
+.sp-theme-steampunk .window-fixed-size,
+.sp-theme-steampunk .window-resizeable,
+.sp-theme-steampunk .window-fixed,
+.sp-theme-steampunk .window-box,
+.sp-theme-steampunk .window-small
+{
+    decorator: tiled-box(
+        sp-frame-tl, sp-frame-t, sp-frame-tr,
+        sp-frame-l,  sp-frame-c, sp-frame-r,
+        sp-frame-bl, sp-frame-b, sp-frame-br
+    );
+}
+.sp-theme-steampunk .window-fixed-size,
+.sp-theme-steampunk .window-resizeable,
+.sp-theme-steampunk .window-fixed
+{
+    padding-left: 8dp;
+    padding-right: 8dp;
+}
+.sp-theme-steampunk .window-fixed-size,
+.sp-theme-steampunk .window-fixed { padding-bottom: 8dp; }
+.sp-theme-steampunk .window-box { padding: 8dp; }
+/* Inner panels: dark iron with a thin brass edge */
+.sp-theme-steampunk #window-content,
+.sp-theme-steampunk .window-pane
+{
+    decorator: none;
+    background: rgba(24, 18, 14, 170);
+    border: 1dp rgb(122, 86, 36);
+    /* Square corners on purpose: a rounded, scrolling panel that holds
+       another rounded, scrolling box (skills window) hides its contents. */
+    border-radius: 0dp;
+}
+/* Close button: tint the red art toward brass/copper */
+.sp-theme-steampunk button.window-title-close { image-color: rgb(235, 195, 135); }
+.sp-theme-steampunk button.window-title-close:hover { image-color: rgb(255, 225, 170); }
+.sp-theme-steampunk .window-resize-handle { image-color: rgb(214, 170, 96); }
+.sp-theme-steampunk span.line-splitter { image-color: rgb(214, 170, 96); }
+/* ---- Title bar ---------------------------------------------------------
+ * The brass border is 6dp thick, so the title strip runs from 6dp to
+ * 32dp: tall enough for the full-size (24x26) X. The title text and
+ * the X are both centred in that strip.
+ * ------------------------------------------------------------------- */
+.sp-theme-steampunk .window-fixed-size,
+.sp-theme-steampunk .window-resizeable,
+.sp-theme-steampunk .window-fixed { padding-top: 32dp; }
+.sp-theme-steampunk .window-title
+{
+    top: 6dp;
+    height: 26dp;
+    line-height: 26dp;
+    padding-left: 12dp;
+    color: rgb(243, 211, 138);
+}
+.sp-theme-steampunk button.window-title-close
+{
+    top: 6dp;          /* sits just inside the 6dp top border */
+    right: 10dp;       /* clear of the 6dp side border */
+}
+/* ---- Buttons ----------------------------------------------------------
+ * Dark glass art with a brass rim and a gloss band (sp-btn-* in
+ * spritesheet_steampunk.css). The selectors copy button.css so they win on
+ * specificity when this file loads after it.
+ * ------------------------------------------------------------------- */
+.sp-theme-steampunk button.default,
+.sp-theme-steampunk tab.default
+{
+    decorator: tiled-horizontal( sp-btn-n-l, sp-btn-n-c, sp-btn-n-r );
+    image-color: rgb(255, 255, 255);
+    color: rgb(255, 240, 210);
+    font-effect: outline(1dp rgb(50, 30, 10));
+}
+/* Hover: clearly brighter, polished brass with lighter text */
+.sp-theme-steampunk button.default:not(button[disabled]):hover,
+.sp-theme-steampunk tab.default:not(button[disabled]):hover,
+.sp-theme-steampunk .ui-tabs > button.default:not(button[disabled]):hover,
+.sp-theme-steampunk button.default.ui-compact:not(button[disabled]):hover
+{
+    decorator: tiled-horizontal( sp-btn-h-l, sp-btn-h-c, sp-btn-h-r );
+    image-color: rgb(255, 255, 255);
+    color: rgb(255, 250, 235);
+}
+/* Hover on the already-selected tab: a lighter copper */
+.sp-theme-steampunk button.default.selected:not(button[disabled]):hover,
+.sp-theme-steampunk .ui-tabs > button.active:not(button[disabled]):hover,
+.sp-theme-steampunk .ui-tabs > button.selected:not(button[disabled]):hover,
+.sp-theme-steampunk tab.default:selected:hover
+{
+    decorator: tiled-horizontal( sp-btn-a-l, sp-btn-a-c, sp-btn-a-r );
+    image-color: rgb(255, 255, 255);
+    color: rgb(255, 245, 210);
+}
+.sp-theme-steampunk button.default:not(button[disabled]):active,
+.sp-theme-steampunk button.default.selected,
+.sp-theme-steampunk tab.default:not(button[disabled]):active,
+.sp-theme-steampunk tab.default:active,
+.sp-theme-steampunk tab.default:selected
+{
+    decorator: tiled-horizontal( sp-btn-a-l, sp-btn-a-c, sp-btn-a-r );
+    image-color: rgb(255, 255, 255);
+    color: rgb(255, 230, 160);
+}
+.sp-theme-steampunk button[disabled]
+{
+    image-color: rgb(110, 100, 90);
+    color: rgb(170, 160, 150);
+}
+.sp-theme-steampunk button.default:disabled,
+.sp-theme-steampunk button.default[disabled],
+.sp-theme-steampunk tab.default:disabled,
+.sp-theme-steampunk tab.default[disabled],
+body.sp-theme-steampunk button.default[disabled],
+body.sp-theme-steampunk button.default[disabled]:hover,
+body.sp-theme-steampunk button.default[disabled]:active,
+body.sp-theme-steampunk button.default.selected[disabled],
+body.sp-theme-steampunk button.default.ui-compact[disabled],
+body.sp-theme-steampunk button.default.ui-compact[disabled]:hover,
+body.sp-theme-steampunk .ui-tabs > button.default[disabled],
+body.sp-theme-steampunk tab.default[disabled]:hover
+{
+    decorator: tiled-horizontal( sp-btn-d-l, sp-btn-d-c, sp-btn-d-r );
+    image-color: rgb(255, 255, 255);
+    color: rgb(170, 160, 150);
+}
+/* Compact tab buttons from components.css */
+.sp-theme-steampunk .ui-tabs > button.active,
+.sp-theme-steampunk .ui-tabs > button.selected
+{
+    decorator: tiled-horizontal( sp-btn-a-l, sp-btn-a-c, sp-btn-a-r );
+    image-color: rgb(255, 255, 255);
+    color: rgb(255, 230, 160);
+}
+/* ---- Text accents ------------------------------------------------------ */
+.sp-theme-steampunk label[for]:hover,
+.sp-theme-steampunk details > summary:hover,
+.sp-theme-steampunk listbox-item:not([disabled]):hover { color: rgb(243, 211, 138); }
+/* ---- Sliders ----------------------------------------------------------- */
+.sp-theme-steampunk input.range slidertrack { image-color: rgb(180, 138, 69); }
+.sp-theme-steampunk input.range sliderbar { image-color: rgb(214, 170, 96); }
+.sp-theme-steampunk input.range sliderbar:hover,
+.sp-theme-steampunk input.range slidertrack:hover + sliderbar { image-color: rgb(250, 215, 150); }
+/* ---- Scrollbars -------------------------------------------------------- */
+.sp-theme-steampunk scrollbarvertical slidertrack { image-color: rgb(150, 112, 55); }
+.sp-theme-steampunk scrollbarvertical sliderbar { image-color: rgb(214, 170, 96); }
+.sp-theme-steampunk scrollbarhorizontal sliderbar { background-color: rgb(180, 138, 69); }
+.sp-theme-steampunk scrollbarhorizontal sliderbar:hover,
+.sp-theme-steampunk scrollbarhorizontal sliderbar:active { background-color: rgb(214, 170, 96); }
+/* ---- Dropdowns --------------------------------------------------------- */
+.sp-theme-steampunk select option:hover,
+.sp-theme-steampunk select selectvalue:hover,
+.sp-theme-steampunk select selectbox option[selected] { color: rgb(214, 170, 96); }
+.sp-theme-steampunk select selectbox
+{
+    background: rgba(36, 30, 25, 235);
+    border-bottom: 1dp rgb(122, 86, 36);
+    border-left: 1dp rgb(122, 86, 36);
+    border-right: 1dp rgb(122, 86, 36);
+}
+/* ---- Tooltips -----------------------------------------------------------
+ * Simple hover hints are parchment. Item and skill tooltips
+ * (.ui-tooltip-surface) stay dark iron, because the game fills them with
+ * white and rarity-coloured text that would not read on parchment.
+ * ------------------------------------------------------------------- */
+.sp-theme-steampunk .tooltip .tooltiptext
+{
+    background: rgba(226, 208, 170, 245);
+    color: rgb(60, 40, 20);
+    border: 1dp rgb(122, 86, 36);
+    font-effect: none;
+}
+.sp-theme-steampunk .ui-tooltip-surface
+{
+    background: rgba(30, 24, 19, 245);
+    border: 1dp rgb(180, 138, 69);
+    border-radius: 2dp;
+}
+/* ---- Dropped item labels: brass-edged iron tags ------------------------
+ * The client sets each name's colour inline (data-style-color), which a
+ * stylesheet can't override, so the tag stays dark to keep white and
+ * gold names readable. Change the background alpha (180) to taste,
+ * or use "background: transparent;" for no box at all.
+ * ------------------------------------------------------------------- */
+.sp-theme-steampunk .dropped-item
+{
+    background: rgba(36, 30, 25, 180);
+    border: 1dp rgb(122, 86, 36);
+    border-radius: 2dp;
+}
+/* ---- Party / arena overlays -------------------------------------------- */
+.sp-theme-steampunk #party,
+.sp-theme-steampunk #arena-group
+{
+    background-color: rgba(36, 30, 25, 170);
+    border: 1dp rgb(122, 86, 36);
+    border-radius: 2dp;
+}
+.sp-theme-steampunk .ui-roster-member.leader .ui-roster-name,
+.sp-theme-steampunk .ui-section-title,
+.sp-theme-steampunk .ui-detail-value { color: rgb(243, 211, 138); }
+/* Selection colours for item slots and lists */
+.sp-theme-steampunk .ui-selectable-slots item-slot:hover,
+.sp-theme-steampunk button.ui-icon-choice:hover { border-color: rgb(205, 120, 60); }
+.sp-theme-steampunk .ui-selectable-slots item-slot.selected,
+.sp-theme-steampunk button.ui-icon-choice.selected { border-color: rgb(214, 170, 96); }
+.sp-theme-steampunk .ui-list-row.selected,
+.sp-theme-steampunk .ui-list > listbox-item:not([disabled])[selected],
+.sp-theme-steampunk listbox-item:not([disabled])[selected]
+{
+    background: rgba(214, 170, 96, 50);
+    color: rgb(243, 211, 138);
+}
+/* =====================================================================
+ * Shared pieces the base stylesheets still colour on their own
+ * (html.css, input.css, label.css, listbox.css, details.css,
+ *  components.css). The originals stay untouched.
+ * ===================================================================== */
+/* Keyboard focus outline: bright yellow -> brass */
+.sp-theme-steampunk [focus]:focus { border-color: rgb(214, 170, 96); }
+/* Small icon buttons (red glass art) tinted toward brass */
+.sp-theme-steampunk button.minus,
+.sp-theme-steampunk button.plus,
+.sp-theme-steampunk button.left-sm,
+.sp-theme-steampunk button.right-sm,
+.sp-theme-steampunk button.down-arrow,
+.sp-theme-steampunk button.trash,
+.sp-theme-steampunk button.close,
+.sp-theme-steampunk button.settings,
+.sp-theme-steampunk .button-move,
+.sp-theme-steampunk .button-resize,
+.sp-theme-steampunk select selectarrow,
+.sp-theme-steampunk details > summary > summary-marker { image-color: rgb(235, 195, 135); }
+.sp-theme-steampunk button.minus:hover,
+.sp-theme-steampunk button.plus:hover,
+.sp-theme-steampunk button.left-sm:hover,
+.sp-theme-steampunk button.right-sm:hover,
+.sp-theme-steampunk button.down-arrow:hover,
+.sp-theme-steampunk button.trash:hover,
+.sp-theme-steampunk button.close:hover,
+.sp-theme-steampunk button.settings:hover,
+.sp-theme-steampunk .button-move:hover,
+.sp-theme-steampunk .button-resize:hover,
+.sp-theme-steampunk select selectarrow:hover,
+.sp-theme-steampunk details > summary:hover > summary-marker { image-color: rgb(255, 225, 170); }
+/* Checkboxes and radio buttons */
+.sp-theme-steampunk input[type="radio"],
+.sp-theme-steampunk input[type="checkbox"],
+.sp-theme-steampunk button.checkbox { image-color: rgb(240, 210, 160); }
+/* Text boxes, dropdowns and framed labels: warm the glass frame */
+.sp-theme-steampunk input[type="text"],
+.sp-theme-steampunk input[type="password"],
+.sp-theme-steampunk input[type="email"],
+.sp-theme-steampunk textarea,
+.sp-theme-steampunk select,
+.sp-theme-steampunk label.textarea,
+.sp-theme-steampunk label.custom,
+.sp-theme-steampunk label.custom-2 { image-color: rgb(235, 205, 160); }
+.sp-theme-steampunk label.text { background-color: rgba(36, 30, 25, 170); }
+/* Dropdown list rows */
+.sp-theme-steampunk select option { border-top: 1dp rgba(122, 86, 36, 160); }
+.sp-theme-steampunk select option:hover { background: rgba(70, 52, 34, 230); }
+/* List hover: grey -> faint brass */
+.sp-theme-steampunk listbox-item:not([disabled]):not([selected]):hover,
+.sp-theme-steampunk .ui-list-row:hover,
+.sp-theme-steampunk .ui-list > listbox-item:not([disabled]):not([selected]):hover { background: rgba(214, 170, 96, 30); }
+/* Icon choice buttons (clan marks etc.) */
+.sp-theme-steampunk button.ui-icon-choice
+{
+    background-color: rgba(36, 30, 25, 170);
+    border-color: rgb(122, 86, 36);
+}
+/* Item stack counts */
+.sp-theme-steampunk item-slot .item-quantity { background: rgba(30, 24, 19, 170); }
+/* Video player controls (video.css): iron bar, brass track and buttons */
+.sp-theme-steampunk .video-controls { background-color: rgba(30, 24, 19, 200); border-top: 1dp rgb(122, 86, 36); }
+.sp-theme-steampunk .video-controls__button { background-color: rgba(214, 170, 96, 60); color: rgb(255, 240, 210); }
+.sp-theme-steampunk .video-controls__track { background-color: rgba(122, 86, 36, 140); }
+.sp-theme-steampunk .video-controls__fill { background-color: rgb(214, 170, 96); }
+.sp-theme-steampunk .video-controls__thumb { background-color: rgb(243, 211, 138); }
+/* Empty item slots everywhere (inventory, storage, trade, shops): riveted brass
+   sockets instead of the grey squares. "body" makes this beat item_slot.css. */
+body.sp-theme-steampunk item-slot[empty="1"] { decorator: image(sp-slot); }
+/* Tooltips grow to fit their text instead of letting it run past the edge */
+.sp-theme-steampunk .tooltip .tooltiptext { width: auto; max-width: none; }
+.sp-theme-steampunk .ui-tooltip-surface { width: auto; }

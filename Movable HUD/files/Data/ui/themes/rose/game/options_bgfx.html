@@ -5,10 +5,6 @@
         <link type="text/template" href="../templates/window-resizeable.html" />
 
         <style>
-            /* ==== Parts of the page for one look only (the other look's part stays hidden) ==== */
-            #game-options.sp-theme-default .sp-only-steampunk { display: none; }
-            #game-options.sp-theme-steampunk .sp-only-default { display: none; }
-
             /* ==== Both looks ==== */
             #game-options { min-width: 650dp; min-height: 350dp; width: 870dp; height: 570dp; }
             tabset { width: 100%; height: 100%; display: flex; flex-direction: row; gap: 4dp; box-sizing: border-box; }
@@ -47,35 +43,25 @@
             .keybind-table button.default { min-width: 0dp; width: 130dp; }
             h3 { margin-bottom: 3dp; }
             .button-row { display: flex; justify-content: flex-end; margin-top: 6dp; }
-            .sp-swatch-row { display: flex; flex-direction: row; flex-wrap: wrap; align-items: center; gap: 3dp; }
-            .sp-swatch.selected { border: 2dp rgb(255, 240, 200); }
-            .sp-swatch-default { min-width: 5dp; margin-right: 4dp; }
-            .sp-addon-row { display: block; margin: 3dp 0; }
-            .sp-addon-name { color: rgb(180, 180, 180); font-size: 11dp; }
-            .sp-chat-sample { font-weight: 800; font-effect: outline(1dp black); }
-            .sp-note { font-size: 11dp; color: rgb(180, 180, 180); }
-            .sp-sec { display: none; }
-            .sp-sec.sp-shown { display: block; }
-            #game-options.sp-has-item_labels tr.sp-game-item-row { display: none; }
-            #game-options.sp-no-ui-tab #sp-ui-tab { display: none; }
 
             /* ==== Default UI look only ==== */
             .sp-theme-default .settings-group { display: block; padding: 8dp 10dp; margin-bottom: 6dp; background: rgba(0, 0, 0, 50); border: 1dp rgba(120, 120, 120, 80); border-radius: 4dp; box-sizing: border-box; }
             .sp-theme-default .settings-group > h3 { margin-top: 0; margin-bottom: 4dp; font-size: 1.05em; color: #f39c12; font-effect: outline(1dp black); }
             .sp-theme-default .options-panel details { display: block; margin-bottom: 6dp; padding: 4dp 6dp 8dp 6dp; background: rgba(0, 0, 0, 50); border: 1dp rgba(120, 120, 120, 80); border-radius: 4dp; box-sizing: border-box; }
             .sp-theme-default .options-panel details > summary > summary-text { color: #f39c12; font-weight: 800; font-effect: outline(1dp black); }
-            .sp-theme-default .sp-swatch { display: inline-block; width: 16dp; height: 16dp; box-sizing: border-box; border: 1dp rgb(60, 60, 60); cursor: hand; }
-            .sp-theme-default .sp-swatch:hover { border-color: rgb(255, 230, 110); }
 
             /* ==== Steampunk look only ==== */
             .sp-theme-steampunk .settings-group { display: block; padding: 8dp 10dp; margin-bottom: 6dp; background: rgba(24, 18, 14, 150); border: 1dp rgb(122, 86, 36); border-radius: 4dp; box-sizing: border-box; }
             .sp-theme-steampunk .settings-group > h3 { margin-top: 0; margin-bottom: 4dp; font-size: 1.05em; color: rgb(243, 211, 138); font-effect: outline(1dp black); }
             .sp-theme-steampunk .options-panel details { display: block; margin-bottom: 6dp; padding: 4dp 6dp 8dp 6dp; background: rgba(24, 18, 14, 150); border: 1dp rgb(122, 86, 36); border-radius: 4dp; box-sizing: border-box; }
             .sp-theme-steampunk .options-panel details > summary > summary-text { color: rgb(243, 211, 138); font-weight: 800; font-effect: outline(1dp black); }
+            .sp-theme-steampunk .sp-swatch-row { display: flex; flex-direction: row; flex-wrap: wrap; align-items: center; gap: 3dp; }
             .sp-theme-steampunk .sp-swatch { display: inline-block; width: 16dp; height: 16dp; box-sizing: border-box; border: 1dp rgb(60, 45, 28); cursor: hand; }
             .sp-theme-steampunk .sp-swatch:hover { border-color: rgb(243, 211, 138); }
+            .sp-theme-steampunk .sp-swatch.selected { border: 2dp rgb(255, 240, 200); }
+            .sp-theme-steampunk .sp-swatch-default { min-width: 5dp; margin-right: 4dp; }
+            .sp-theme-steampunk .sp-chat-sample { font-weight: 800; font-effect: outline(1dp black); }
 
-            .sp-theme-steampunk .sp-note { color: rgb(201, 180, 138); }
         </style>
         <script>
 -- Theme check (add-on windows work with the default UI and with the Steampunk
@@ -97,440 +83,7 @@ pcall(function()
     -- (parts written for the other look stay in the window, hidden)
 end)
         </script>
-    <script>
--- Dropped item label background: a 0-10 slider (0 = clear, 10 = solid).
--- Shared by options_bgfx.html (the slider) and dropped_item_labels.html
--- (the labels). The value is saved to a small text file when the game's
--- Lua allows file access. Written inline because the game ignores edited .lua files.
-local SAVE_FILE = 'sp_label_alpha.txt'
-local DEFAULT = 0
-local LABELS_ID = 'dropped-item-labels'
-local ROOT_ID = 'dropped-item-labels-root'
-
-local function load_value()
-    local ok, v = pcall(function()
-        local f = io.open(SAVE_FILE, 'r')
-        if not f then return nil end
-        local n = tonumber(f:read('*l'))
-        f:close()
-        return n
-    end)
-    if ok and v then return math.max(0, math.min(10, math.floor(v))) end
-    if _G and type(_G.SP_LABEL_ALPHA) == 'number' then return _G.SP_LABEL_ALPHA end
-    return DEFAULT
-end
-
-local function save_value(v)
-    if _G then _G.SP_LABEL_ALPHA = v end
-    pcall(function()
-        local f = io.open(SAVE_FILE, 'w')
-        if f then f:write(tostring(v)); f:close() end
-    end)
-end
-
--- Put class sp-alpha-<v> on the labels root (and remove the others)
-local function apply_to(doc, v)
-    if not doc then return false end
-    local root = doc:GetElementById(ROOT_ID)
-    if not root then return false end
-    for i = 0, 10 do root:SetClass('sp-alpha-' .. i, i == v) end
-    return true
-end
-
-local value = load_value()
-
-if document:GetElementById(ROOT_ID) then
-    ------------------------------------------------ labels document
-    apply_to(document, value)
-    local me = document
-    if _G then _G.SP_LABELS_APPLY = function(v) apply_to(me, v) end end
-else
-    ------------------------------------------------ options document
-  local ok, err = pcall(function()
-    local slider = document:GetElementById('sp-label-alpha')
-    local readout = document:GetElementById('sp-label-alpha-value')
-    local function show(v) if readout then readout.inner_rml = string.format('%d', math.floor(v * 10 + 0.5)) .. '%' end end
-
-    local function push(v)
-        -- 1) the labels document registered a function
-        local dbg = document:GetElementById('sp-label-alpha-debug')
-        if _G and type(_G.SP_LABELS_APPLY) == 'function' and pcall(_G.SP_LABELS_APPLY, v) then
-            if dbg then dbg.inner_rml = '' end
-            return
-        end
-        local reached = false
-        -- 2) find the labels document through the context
-        pcall(function()
-            local ctx = document.context
-            local doc = ctx.documents[LABELS_ID]
-            reached = apply_to(doc, v)
-            if not reached then
-                for i = 0, #ctx.documents - 1 do
-                    local d = ctx.documents[i]
-                    if d and d.id == LABELS_ID then reached = apply_to(d, v) break end
-                end
-            end
-        end)
-        if dbg then dbg.inner_rml = reached and '' or 'Saved. The labels will update after a restart (could not reach them live).' end
-    end
-
-    if slider then
-        slider:SetAttribute('value', tostring(value))
-        show(value)
-        slider:AddEventListener('change', function(event)
-            local v = tonumber(event.parameters and event.parameters.value)
-            if v == nil then pcall(function() v = tonumber(slider.value) end) end
-            if v == nil then pcall(function() v = tonumber(event.current_element:GetAttribute('value')) end) end
-            if v == nil then v = tonumber(slider:GetAttribute('value')) or value end
-            v = math.max(0, math.min(10, math.floor(v + 0.5)))
-            value = v
-            show(v)
-            save_value(v)
-            push(v)
-        end)
-    end
-    push(value)
-  end)
-  if not ok then
-    local r = document:GetElementById('sp-label-alpha-value')
-    if r then r.inner_rml = 'Lua error' end
-    local d = document:GetElementById('sp-label-alpha-debug')
-    if d then d.inner_rml = tostring(err):gsub('&','&amp;'):gsub('<','&lt;') end
-  end
-end
-
-    </script>
-    <script>
-
--- Chat message colours (Message Colours add-on). Shared by options_bgfx.html (the
--- picker) and chat_box.html (the messages). Written inline because the game
--- ignores edited .lua files. Choices are saved to sp_chat_colors.txt.
-local CHANNELS = {{id='chat', name='Chat', default='rgb(255, 255, 255)'}, {id='shout', name='Shout', default='rgb(255, 105, 105)'}, {id='whisper', name='Whisper', default='rgb(255, 158, 232)'}, {id='trade', name='Trade', default='rgb(0, 210, 50)'}, {id='party', name='Party', default='rgb(189, 250, 255)'}, {id='clan', name='Clan', default='rgb(255, 228, 122)'}, {id='group', name='Group', default='rgb(156, 175, 243)'}, {id='quest', name='Quest', default='rgb(151, 221, 241)'}, {id='system', name='System', default='rgb(255, 224, 229)'}}
-local PALETTE = {{name='White', rgb='rgb(255, 255, 255)'}, {name='Parchment', rgb='rgb(226, 208, 170)'}, {name='Brass', rgb='rgb(214, 170, 96)'}, {name='Gold', rgb='rgb(255, 215, 90)'}, {name='Copper', rgb='rgb(205, 120, 60)'}, {name='Orange', rgb='rgb(255, 150, 60)'}, {name='Red', rgb='rgb(255, 90, 80)'}, {name='Pink', rgb='rgb(255, 150, 220)'}, {name='Purple', rgb='rgb(190, 150, 255)'}, {name='Blue', rgb='rgb(120, 170, 255)'}, {name='Cyan', rgb='rgb(120, 230, 240)'}, {name='Green', rgb='rgb(110, 220, 110)'}}
-local SAVE_FILE = 'sp_chat_colors.txt'
-local CHAT_ID = 'game-chat-box'
-local picks = {}   -- channel id -> palette index (0 = game default)
-pcall(function()
-    local f = io.open(SAVE_FILE, 'r')
-    if not f then return end
-    for line in f:lines() do
-        local k, v = line:match('^%s*([%w_]+)%s*=%s*(%d+)')
-        if k then picks[k] = math.max(0, math.min(#PALETTE, tonumber(v))) end
-    end
-    f:close()
-end)
-if _G and type(_G.SP_CHAT_PICKS) == 'table' then
-    for k, v in pairs(_G.SP_CHAT_PICKS) do if picks[k] == nil then picks[k] = v end end
-end
-local function save()
-    if _G then _G.SP_CHAT_PICKS = picks end
-    pcall(function()
-        local f = io.open(SAVE_FILE, 'w')
-        if not f then return end
-        for _, c in ipairs(CHANNELS) do f:write(c.id, '=', tostring(picks[c.id] or 0), '\n') end
-        f:close()
-    end)
-end
--- Put class sp-<channel>-<n> on the chat window body
-local function apply_to(doc)
-    if not doc then return false end
-    local body = doc:GetElementById(CHAT_ID)
-    if not body then return false end
-    for _, c in ipairs(CHANNELS) do
-        for i = 1, #PALETTE do body:SetClass('sp-' .. c.id .. '-' .. i, (picks[c.id] or 0) == i) end
-    end
-    return true
-end
-
-local ok, err = pcall(function()
-    local box = document:GetElementById('sp-chat-colors')
-    if not box then return end
-    local function colour_of(c)
-        local i = picks[c.id] or 0
-        return i > 0 and PALETTE[i].rgb or c.default
-    end
-    local function render()
-        local rows = {}
-        for _, c in ipairs(CHANNELS) do
-            local cells = {'<button class="default ui-compact sp-swatch-default' .. (((picks[c.id] or 0) == 0) and ' selected' or '') ..
-                '" sp-chan="' .. c.id .. '" sp-col="0">Default</button>'}
-            for i, p in ipairs(PALETTE) do
-                cells[#cells + 1] = '<span class="sp-swatch' .. ((picks[c.id] == i) and ' selected' or '') ..
-                    '" sp-chan="' .. c.id .. '" sp-col="' .. i .. '" style="background-color: ' .. p.rgb .. ';" tooltip="' .. p.name .. '"></span>'
-            end
-            rows[#rows + 1] = '<tr><td><span class="sp-chat-sample" style="color: ' .. colour_of(c) .. ';">' .. c.name ..
-                '</span></td><td><div class="sp-swatch-row">' .. table.concat(cells) .. '</div></td></tr>'
-        end
-        box.inner_rml = '<table class="main"><tbody>' .. table.concat(rows) .. '</tbody></table>'
-    end
-    local function push()
-        local dbg = document:GetElementById('sp-chat-colors-status')
-        local reached = false
-        if _G and type(_G.SP_CHAT_APPLY) == 'function' then reached = pcall(_G.SP_CHAT_APPLY, picks) end
-        if not reached then
-            pcall(function()
-                local ctx = document.context
-                reached = apply_to(ctx.documents[CHAT_ID])
-                if not reached then
-                    for i = 0, #ctx.documents - 1 do
-                        if apply_to(ctx.documents[i]) then reached = true break end
-                    end
-                end
-            end)
-        end
-        if dbg then dbg.inner_rml = reached and '' or 'Saved. The chat will use these colours after a restart.' end
-    end
-    box:AddEventListener('click', function(event)
-        local t = event.target_element
-        while t and t ~= box do
-            local chan, col = t:GetAttribute('sp-chan'), tonumber(t:GetAttribute('sp-col'))
-            if chan and col then
-                picks[chan] = col
-                save()
-                render()
-                push()
-                event:StopPropagation()
-                return
-            end
-            t = t.parent_node
-        end
-    end)
-    render()
-    push()
-end)
-if not ok then
-    local d = document:GetElementById('sp-chat-colors-status')
-    if d then d.inner_rml = ('Lua error: ' .. tostring(err)):gsub('&', '&amp;'):gsub('<', '&lt;') end
-end
-
-    </script>
-    <script>
--- "Bring all windows on screen" (Window Rescue add-on). Moves any window that sits
--- partly or fully outside the game window back inside it. Windows already on
--- screen, and full-screen layers (names, labels), are left alone.
-local ok, err = pcall(function()
-    local button = document:GetElementById('sp-windows-onscreen')
-    local status = document:GetElementById('sp-windows-status')
-    if not button then return end
-    local function each(list, fn)
-        if not list then return end
-        local i = list[0] and 0 or 1
-        while list[i] do fn(list[i]); i = i + 1 end
-    end
-    button:AddEventListener('click', function()
-        local moved, checked = 0, 0
-        local ok2, err2 = pcall(function()
-            local ctx = document.context
-            local W, H = ctx.dimensions.x, ctx.dimensions.y
-            each(ctx.documents, function(doc)
-                local w, h = doc.offset_width or 0, doc.offset_height or 0
-                if w <= 0 or h <= 0 or w >= W * 0.9 or h >= H * 0.9 then return end   -- skip empty and full-screen layers
-                checked = checked + 1
-                local x, y = doc.offset_left or 0, doc.offset_top or 0
-                local nx = math.max(0, math.min(W - w, x))
-                local ny = math.max(0, math.min(H - h, y))
-                if nx ~= x or ny ~= y then
-                    doc.style.left = math.floor(nx) .. 'px'
-                    doc.style.top = math.floor(ny) .. 'px'
-                    moved = moved + 1
-                end
-            end)
-        end)
-        if status then
-            if not ok2 then status.inner_rml = ('Could not move windows: ' .. tostring(err2)):gsub('&', '&amp;'):gsub('<', '&lt;')
-            elseif moved == 0 then status.inner_rml = 'All ' .. checked .. ' windows are already on screen.'
-            else status.inner_rml = 'Moved ' .. moved .. (moved == 1 and ' window' or ' windows') .. ' back on screen.' end
-        end
-    end)
-end)
-    </script>
-    <script>
--- Add-on settings (shared: every add-on that adds something to Options ships
--- this same file, so it doesn't matter which or how many are installed).
--- An add-on counts as installed while its marker file
--- Data/ui/sp_addons/<key>.txt exists; the launcher copies it in with the
--- add-on and takes it out with it. Only installed add-ons show: the first one
--- on the first line of Options > UI > Add-ons, the next one underneath, and
--- so on. Add-ons with their own settings (Dropped Items, Windows, Message
--- Colours) show their own section the same way.
--- The switches are saved in sp_addons.txt as key=0/1. The Ice UI uses that
--- file too, so every line is kept as it is and in the same order; only the
--- switch that was changed is rewritten.
-pcall(function()
-    local document = document
-    local FLAGS = 'sp_addons.txt'
-    -- add-ons with an on/off switch: key, switch text, add-on name (listed in this order)
-    local SWITCHES = {
-        {'dps_meter', 'DPS meter under the target', 'DPS Meter'},
-        {'exp_tracker', 'EXP per hour when hovering the EXP bar', 'EXP Tracker'},
-        {'weapon_slot', 'Weapon slot beside the HUD bars', 'HUD Weapon Slot'},
-        {'weapon_refresh', 'Keep the HUD weapon durability up to date', 'Weapon Refresh'},
-        {'hud_move', 'Move the HUD by holding its footer', 'Movable HUD'},
-        {'friend_levels', 'Remembered levels in the friend and group lists', 'Friend Levels'},
-        {'class_icons', 'Class icons in party and group', 'Class Icons'},
-        {'party_buffs', 'Buff icon options in party and group', 'Party Buff Options'},
-        {'summon_extras', 'Summon HP, range and low-HP warning', 'Summon Gauge Plus'},
-        {'mob_levels', 'Monster level above monster names', 'Monster Levels'},
-        {'craft_max', 'Max button in the crafting window', 'Craft Max'},
-        {'minimap_pad', 'Window under the minimized minimap', 'Minimap Window'},
-    }
-    -- add-ons with a section of their own: key, id of that section
-    local SECTIONS = {
-        {'item_labels', 'sp-sec-item_labels'},
-        {'window_rescue', 'sp-sec-window_rescue'},
-        {'msg_colors', 'sp-sec-msg_colors'},
-    }
-    local UI_TAB = {item_labels = true, window_rescue = true}   -- sections in the UI tab
-    local function el(id) return document:GetElementById(id) end
-    local function installed(key)
-        local yes = true      -- if the game won't let the UI read files, show everything
-        pcall(function()
-            local f = io.open('Data/ui/sp_addons/' .. key .. '.txt', 'r')
-            if f then f:close() else yes = false end
-        end)
-        return yes
-    end
-    -- sp_addons.txt: every line kept, in order
-    local function read_flags()
-        local vals, order = {}, {}
-        pcall(function()
-            local f = io.open(FLAGS, 'r')
-            if not f then return end
-            for line in f:lines() do
-                local k, v = line:match('^%s*([%w_]+)%s*=%s*(%d+)')
-                if k then
-                    if vals[k] == nil then order[#order + 1] = k end
-                    vals[k] = v
-                end
-            end
-            f:close()
-        end)
-        return vals, order
-    end
-    local function set_flag(key, on)
-        local vals, order = read_flags()
-        if vals[key] == nil then order[#order + 1] = key end
-        vals[key] = on and '1' or '0'
-        local ok = pcall(function()
-            local f = assert(io.open(FLAGS, 'w'))
-            for _, k in ipairs(order) do f:write(k, '=', vals[k], '\n') end
-            f:close()
-        end)
-        local st = el('sp-addon-status')
-        if st and not ok then st.inner_rml = 'Could not save the switch.' end
-    end
-    local shown = nil
-    local function build()
-        local body = el('game-options')
-        local vals = read_flags()
-        local have, ui_used = {}, false
-        for _, s in ipairs(SECTIONS) do
-            local on = SP_THEME == 'steampunk' or installed(s[1])   -- Steampunk has these built in
-            local sec = el(s[2])
-            if sec then sec:SetClass('sp-shown', on) end
-            if body then body:SetClass('sp-has-' .. s[1], on) end
-            if on and UI_TAB[s[1]] then ui_used = true end
-        end
-        local items, sig = {}, {}
-        for _, it in ipairs(SWITCHES) do
-            -- the Steampunk UI theme shows its own element chart instead of the Minimap Window
-            if installed(it[1]) and not (SP_THEME == 'steampunk' and it[1] == 'minimap_pad') then
-                items[#items + 1] = it
-                sig[#sig + 1] = it[1] .. (vals[it[1]] == '0' and '0' or '1')
-            end
-        end
-        if #items > 0 then ui_used = true end
-        local group = el('sp-sec-switches')
-        if group then group:SetClass('sp-shown', #items > 0) end
-        if body then body:SetClass('sp-no-ui-tab', not ui_used) end
-        sig = table.concat(sig, ',')
-        if sig == shown then return end
-        shown = sig
-        local list = el('sp-addon-list')
-        if not list then return end
-        local rows = {}
-        for _, it in ipairs(items) do
-            rows[#rows + 1] = '<div class="sp-addon-row"><input id="sp-addon-' .. it[1] .. '" type="checkbox"'
-                .. (vals[it[1]] == '0' and '' or ' checked=""') .. ' /><label for="sp-addon-' .. it[1] .. '">'
-                .. it[2] .. ' <span class="sp-addon-name">(' .. it[3] .. ')</span></label></div>'
-        end
-        list.inner_rml = table.concat(rows)
-        for _, it in ipairs(items) do
-            local k = it[1]
-            local box = el('sp-addon-' .. k)
-            if box then
-                box:AddEventListener('change', function()
-                    set_flag(k, box:HasAttribute('checked'))
-                    shown = nil
-                end)
-            end
-        end
-        local st = el('sp-addon-status')
-        if st then st.inner_rml = 'A change shows within about 2 seconds.' end
-    end
-    pcall(build)
-    document:AddEventListener('show', function() pcall(build) end)
-end)
-    </script>
-        <script>
--- (runs only in the Steampunk look)
-if SP_THEME ~= 'steampunk' then return end
--- Heading-up minimap switch (steampunk add-on). The minimap window does the
--- turning; this checkbox tells it to (through _G.SP_MINIMAP_SET) and the choice
--- is saved in sp_minimap.txt, which the minimap reads when it loads.
-pcall(function()
-    local document = document
-    local box = document:GetElementById('sp-mm-heading-up')
-    local status = document:GetElementById('sp-mm-status')
-    if not box then return end
-    local on = false
-    pcall(function()
-        if _G and type(_G.SP_MINIMAP_GET) == 'function' then on = _G.SP_MINIMAP_GET() and true or false; return end
-        local f = io.open('sp_minimap.txt', 'r')
-        if f then on = (f:read('*l') or ''):match('heading_up%s*=%s*1') ~= nil; f:close() end
-    end)
-    if on then box:SetAttribute('checked', '') else box:RemoveAttribute('checked') end
-    box:AddEventListener('change', function()
-        local want = box:HasAttribute('checked')
-        if _G and type(_G.SP_MINIMAP_SET) == 'function' then
-            _G.SP_MINIMAP_SET(want)
-            if status then status.inner_rml = '' end
-        else
-            pcall(function()
-                local f = io.open('sp_minimap.txt', 'w')
-                if f then f:write('heading_up=', want and 1 or 0, '\n'); f:close() end
-            end)
-            if status then status.inner_rml = 'Saved. The minimap will use this after a restart.' end
-        end
-    end)
-end)
-    </script>
-    <script>
--- (runs only in the Steampunk look)
-if SP_THEME ~= 'steampunk' then return end
--- Element chart switch (steampunk add-on). Saved in sp_element_chart.txt; the
--- minimap reads it every 2 seconds (and straight away when windows can share).
-pcall(function()
-    local document = document
-    local box = document:GetElementById('sp-el-chart-on')
-    if not box then return end
-    local on = true
-    pcall(function()
-        local f = io.open('sp_element_chart.txt', 'r')
-        if f then on = (f:read('*l') or ''):match('show%s*=%s*0') == nil; f:close() end
-    end)
-    if on then box:SetAttribute('checked', '') else box:RemoveAttribute('checked') end
-    box:AddEventListener('change', function()
-        local want = box:HasAttribute('checked')
-        pcall(function()
-            local f = io.open('sp_element_chart.txt', 'w')
-            if f then f:write('show=', want and 1 or 0, '\n'); f:close() end
-        end)
-        pcall(function() if type(_G) == 'table' and type(_G.SP_ELEMENT_CHART_APPLY) == 'function' then _G.SP_ELEMENT_CHART_APPLY() end end)
-    end)
-end)
-    </script>
-</head>
+    </head>
 
     <body id="game-options" template="window-resizeable">
         <tabset id="options-tabs">
@@ -1303,15 +856,14 @@ end)
                         <h3><str string-id="776">Gameplay</str></h3>
                         <table class="main">
                             <tbody>
-                                <!-- these two move to Options > UI > Dropped Items while the Dropped Item Labels add-on is installed -->
-                                <tr class="sp-game-item-row">
+                                <tr>
                                     <td></td>
                                     <td>
                                         <input id="item-name" type="checkbox" data-checked="game.show_item_name" onchange="game-itemname"/>
                                         <label for="item-name"><str string-id="1367">Show dropped item name</str></label>
                                     </td>
                                 </tr>
-                                <tr class="sp-game-item-row">
+                                <tr>
                                     <td></td>
                                     <td>
                                         <input id="pickup-status" type="checkbox" data-checked="game.show_item_status" onchange="game-itemstatus"/>
@@ -1650,13 +1202,6 @@ end)
                             </table>
                         </div>
 
-                        <!-- Message Colours add-on (script at the end of <head>); shown while it is installed -->
-                        <details id="sp-sec-msg_colors" class="sp-sec">
-                            <summary>Message Colours</summary>
-                            <div id="sp-chat-colors">Lua has not run in this window</div>
-                            <div id="sp-chat-colors-status" class="sp-note"></div>
-                        </details>
-
                         <!-- Chat Box Tabs -->
                         <div class="settings-group">
                             <h3>Chat Box Tabs</h3>
@@ -1765,92 +1310,6 @@ end)
                         <button class="default" style="min-width: 5dp;" data-event-click="reset_default()">Reset chat settings to default</button>
                     </div>
 
-                </div>
-            </panel>
-            <!-- ===================== UI (add-ons) ===================== -->
-            <!-- Each add-on's part shows only while that add-on is installed, one under the other -->
-            <tab id="sp-ui-tab" class="default">UI</tab>
-            <panel class="content-box">
-                <div class="options-panel" data-model="options-data">
-                        <div id="sp-sec-switches" class="settings-group sp-sec">
-                            <h3>Add-ons</h3>
-                            <!-- one line per installed add-on, filled in by the script at the end of <head> -->
-                            <div id="sp-addon-list"></div>
-                            <div id="sp-addon-status" class="sp-note"></div>
-                        </div>
-                        <!-- Dropped Item Labels add-on -->
-                        <div id="sp-sec-item_labels" class="settings-group sp-sec">
-                            <h3>Dropped Items</h3>
-                            <table class="main">
-                                <tbody>
-                                        <tr>
-                                            <td>Item names</td>
-                                            <td>
-                                                <input id="sp-item-name" type="checkbox" data-checked="game.show_item_name" onchange="game-itemname"/>
-                                                <label for="sp-item-name"><str string-id="1367">Show dropped item name</str></label>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>Pickup status</td>
-                                            <td>
-                                                <input id="sp-pickup-status" type="checkbox" data-checked="game.show_item_status" onchange="game-itemstatus"/>
-                                                <label for="sp-pickup-status"><str string-id="1371">Show item pickup status</str></label>
-                                            </td>
-                                        </tr>
-                                        <!-- Label background slider (script at the end of <head>); shown while item names are on -->
-                                        <tr data-if="game.show_item_name">
-                                            <td>Label background</td>
-                                            <td>
-                                                <div class="slider-row">
-                                                    <input id="sp-label-alpha" type="range" min="0" max="10" step="1" value="0" style="flex: 1" />
-                                                    <label class="slider-value" id="sp-label-alpha-value">No Lua</label>
-                                                </div>
-                                                <div id="sp-label-alpha-debug" class="sp-note"></div>
-                                            </td>
-                                        </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                        <!-- Steampunk only: its minimap settings -->
-                        <div class="settings-group sp-only-steampunk">
-                            <h3>Minimap</h3>
-                            <table class="main">
-                                <tbody>
-                                    <!-- Steampunk add-on: heading-up minimap (script at the end of <head>) -->
-                                    <tr>
-                                        <td>Minimap</td>
-                                        <td>
-                                            <input id="sp-mm-heading-up" type="checkbox" />
-                                            <label for="sp-mm-heading-up">Turn map with player (facing direction always up)</label>
-                                            <div id="sp-mm-status" class="sp-note"></div>
-                                        </td>
-                                    </tr>
-                                    <!-- Steampunk add-on: element chart under the minimized minimap (script at the end of <head>) -->
-                                    <tr>
-                                        <td></td>
-                                        <td>
-                                            <input id="sp-el-chart-on" type="checkbox" checked="" />
-                                            <label for="sp-el-chart-on">Element chart under the minimized minimap</label>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                        <!-- Window Rescue add-on: pull every window back into view (script at the end of <head>) -->
-                        <div id="sp-sec-window_rescue" class="settings-group sp-sec">
-                            <h3>Windows</h3>
-                            <table class="main">
-                                <tbody>
-                                    <tr>
-                                        <td>Windows</td>
-                                        <td>
-                                            <button id="sp-windows-onscreen" class="default">Bring all windows on screen</button>
-                                            <div id="sp-windows-status" class="sp-note"></div>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
                 </div>
             </panel>
         </tabset>

@@ -1,0 +1,291 @@
+<rml>
+    <head>
+        <link type="text/template" href="../templates/window-fixed.html" />
+        <link type="text/rcss" href="../styles/sp_addons_steampunk_sprites.css" />
+        <link type="text/rcss" href="../styles/sp_addons_steampunk.css" />
+
+        <style>
+            /* ==== Both looks ==== */
+            #game-menu-hud { width: 53dp; right: 0dp; bottom: 0dp; }
+            button { width: 34dp; height: 30dp; }
+            button.blink { animation: 1.5s cubic-in-out infinite alternate color_cycle; }
+            #button-container { text-align: center; width: 43dp; margin-left: 10dp; overflow: hidden; height: 0dp; transition: height 0.2s; }
+            #button-container.expanded { height: 403dp; transition: height 0.2s; }
+            #button-container.expanded-premium { height: 433dp; transition: height 0.2s; }
+            #button-container.expanded-scoreboard { height: 445dp; transition: height 0.2s; }
+            #button-container.expanded-premium-scoreboard { height: 475dp; transition: height 0.2s; }
+            .tooltip .tooltiptext { left: auto; top: -5dp; right: 105%; height: 2.2em; min-width: 130dp; text-align: left; }
+
+            /* ==== Default UI look only ==== */
+            .sp-theme-default #gamearena-scoreboard { decorator: image(button-scoreboard-n); width: 42dp; height: 42dp; opacity: 0.77; }
+            .sp-theme-default #gamearena-scoreboard.blink { decorator: image(button-scoreboard-b); }
+            .sp-theme-default #gamearena-scoreboard:hover { decorator: image(button-scoreboard-h); opacity: 1; }
+            .sp-theme-default #gamearena-scoreboard:active { decorator: image(button-scoreboard-a); opacity: 1; }
+            .sp-theme-default #premium-storage { decorator: image(GEN_MENUBTN31); }
+            .sp-theme-default #premium-storage:hover { decorator: image(GEN_MENUBTN32); }
+            .sp-theme-default #premium-storage:active { decorator: image(GEN_MENUBTN33); }
+            .sp-theme-default #item-mall { decorator: image(GEN_BTN82); width: 43dp; height: 43dp; }
+            .sp-theme-default #item-mall:hover { decorator: image(GEN_BTN83); }
+            .sp-theme-default #item-mall:active { decorator: image(GEN_BTN84); }
+            .sp-theme-default #character { decorator: image(GEN_MENUBTN19); }
+            .sp-theme-default #character:hover { decorator: image(GEN_MENUBTN20); }
+            .sp-theme-default #character:active { decorator: image(GEN_MENUBTN21); }
+            .sp-theme-default #game-arena { decorator: image(GEN_MENUBTN28); }
+            .sp-theme-default #game-arena:hover { decorator: image(GEN_MENUBTN29); }
+            .sp-theme-default #game-arena:active { decorator: image(GEN_MENUBTN30); }
+            .sp-theme-default #group-manager-menu { decorator: image(button-group-manager-n); }
+            .sp-theme-default #group-manager-menu:hover { decorator: image(button-group-manager-h); }
+            .sp-theme-default #group-manager-menu:active { decorator: image(button-group-manager-a); }
+            .sp-theme-default #inventory { decorator: image(GEN_MENUBTN16); }
+            .sp-theme-default #inventory:hover { decorator: image(GEN_MENUBTN17); }
+            .sp-theme-default #inventory:active { decorator: image(GEN_MENUBTN18); }
+            .sp-theme-default #skill-list { decorator: image(GEN_MENUBTN13); }
+            .sp-theme-default #skill-list:hover { decorator: image(GEN_MENUBTN14); }
+            .sp-theme-default #skill-list:active { decorator: image(GEN_MENUBTN15); }
+            .sp-theme-default #quest-list { decorator: image(GEN_MENUBTN10); }
+            .sp-theme-default #quest-list:hover { decorator: image(GEN_MENUBTN11); }
+            .sp-theme-default #quest-list:active { decorator: image(GEN_MENUBTN12); }
+            .sp-theme-default #friend-list { decorator: image(GEN_MENUBTN34); }
+            .sp-theme-default #friend-list:hover { decorator: image(GEN_MENUBTN35); }
+            .sp-theme-default #friend-list:active { decorator: image(GEN_MENUBTN36); }
+            .sp-theme-default #party-finder { decorator: image(GEN_MENUBTN37); }
+            .sp-theme-default #party-finder:hover { decorator: image(GEN_MENUBTN38); }
+            .sp-theme-default #party-finder:active { decorator: image(GEN_MENUBTN39); }
+            .sp-theme-default #mail { decorator: image(GEN_MENUBTN07); }
+            .sp-theme-default #mail:hover { decorator: image(GEN_MENUBTN08); }
+            .sp-theme-default #mail:active { decorator: image(GEN_MENUBTN09); }
+            .sp-theme-default #clan { decorator: image(GEN_MENUBTN04); }
+            .sp-theme-default #clan:hover { decorator: image(GEN_MENUBTN05); }
+            .sp-theme-default #clan:active { decorator: image(GEN_MENUBTN06); }
+            .sp-theme-default #sp-addons-btn { decorator: image(sp-addons-menu-n); }
+            .sp-theme-default #sp-addons-btn:hover { decorator: image(sp-addons-menu-h); }
+            .sp-theme-default #sp-addons-btn:active { decorator: image(sp-addons-menu-a); }
+            .sp-theme-default #system { decorator: image(GEN_MENUBTN22); }
+            .sp-theme-default #system:hover { decorator: image(GEN_MENUBTN23); }
+            .sp-theme-default #system:active { decorator: image(GEN_MENUBTN24); }
+            .sp-theme-default #menu-toggle { decorator: image(GEN_MENUBTN25); width: 53dp; height: 25dp; }
+            .sp-theme-default #menu-toggle:hover { decorator: image(GEN_MENUBTN26); }
+            .sp-theme-default #menu-toggle:active { decorator: image(GEN_MENUBTN27); }
+            .sp-theme-default str { color: #8393ca; }
+
+            /* ==== Steampunk look only ==== */
+            .sp-theme-steampunk #gamearena-scoreboard { decorator: image(sp-menu-scoreboard-n); width: 42dp; height: 42dp; opacity: 1; }
+            .sp-theme-steampunk #gamearena-scoreboard.blink { decorator: image(sp-menu-scoreboard-b); }
+            .sp-theme-steampunk #gamearena-scoreboard:hover { decorator: image(sp-menu-scoreboard-h); opacity: 1; }
+            .sp-theme-steampunk #gamearena-scoreboard:active { decorator: image(sp-menu-scoreboard-a); opacity: 1; }
+            .sp-theme-steampunk #premium-storage { decorator: image(sp-menu-premium-storage-n); }
+            .sp-theme-steampunk #premium-storage:hover { decorator: image(sp-menu-premium-storage-h); }
+            .sp-theme-steampunk #premium-storage:active { decorator: image(sp-menu-premium-storage-a); }
+            .sp-theme-steampunk #item-mall { decorator: image(sp-menu-item-mall-n); width: 43dp; height: 43dp; }
+            .sp-theme-steampunk #item-mall:hover { decorator: image(sp-menu-item-mall-h); }
+            .sp-theme-steampunk #item-mall:active { decorator: image(sp-menu-item-mall-a); }
+            .sp-theme-steampunk #character { decorator: image(sp-menu-character-n); }
+            .sp-theme-steampunk #character:hover { decorator: image(sp-menu-character-h); }
+            .sp-theme-steampunk #character:active { decorator: image(sp-menu-character-a); }
+            .sp-theme-steampunk #game-arena { decorator: image(sp-menu-game-arena-n); }
+            .sp-theme-steampunk #game-arena:hover { decorator: image(sp-menu-game-arena-h); }
+            .sp-theme-steampunk #game-arena:active { decorator: image(sp-menu-game-arena-a); }
+            .sp-theme-steampunk #group-manager-menu { decorator: image(sp-menu-group-manager-n); }
+            .sp-theme-steampunk #group-manager-menu:hover { decorator: image(sp-menu-group-manager-h); }
+            .sp-theme-steampunk #group-manager-menu:active { decorator: image(sp-menu-group-manager-a); }
+            .sp-theme-steampunk #inventory { decorator: image(sp-menu-inventory-n); }
+            .sp-theme-steampunk #inventory:hover { decorator: image(sp-menu-inventory-h); }
+            .sp-theme-steampunk #inventory:active { decorator: image(sp-menu-inventory-a); }
+            .sp-theme-steampunk #skill-list { decorator: image(sp-menu-skills-n); }
+            .sp-theme-steampunk #skill-list:hover { decorator: image(sp-menu-skills-h); }
+            .sp-theme-steampunk #skill-list:active { decorator: image(sp-menu-skills-a); }
+            .sp-theme-steampunk #quest-list { decorator: image(sp-menu-quests-n); }
+            .sp-theme-steampunk #quest-list:hover { decorator: image(sp-menu-quests-h); }
+            .sp-theme-steampunk #quest-list:active { decorator: image(sp-menu-quests-a); }
+            .sp-theme-steampunk #friend-list { decorator: image(sp-menu-friends-n); }
+            .sp-theme-steampunk #friend-list:hover { decorator: image(sp-menu-friends-h); }
+            .sp-theme-steampunk #friend-list:active { decorator: image(sp-menu-friends-a); }
+            .sp-theme-steampunk #party-finder { decorator: image(sp-menu-party-finder-n); }
+            .sp-theme-steampunk #party-finder:hover { decorator: image(sp-menu-party-finder-h); }
+            .sp-theme-steampunk #party-finder:active { decorator: image(sp-menu-party-finder-a); }
+            .sp-theme-steampunk #mail { decorator: image(sp-menu-mail-n); }
+            .sp-theme-steampunk #mail:hover { decorator: image(sp-menu-mail-h); }
+            .sp-theme-steampunk #mail:active { decorator: image(sp-menu-mail-a); }
+            .sp-theme-steampunk #clan { decorator: image(sp-menu-clan-n); }
+            .sp-theme-steampunk #clan:hover { decorator: image(sp-menu-clan-h); }
+            .sp-theme-steampunk #clan:active { decorator: image(sp-menu-clan-a); }
+            .sp-theme-steampunk #sp-addons-btn { decorator: image(sp-menu-addons-n); }
+            .sp-theme-steampunk #sp-addons-btn:hover { decorator: image(sp-menu-addons-h); }
+            .sp-theme-steampunk #sp-addons-btn:active { decorator: image(sp-menu-addons-a); }
+            .sp-theme-steampunk #system { decorator: image(sp-menu-system-n); }
+            .sp-theme-steampunk #system:hover { decorator: image(sp-menu-system-h); }
+            .sp-theme-steampunk #system:active { decorator: image(sp-menu-system-a); }
+            .sp-theme-steampunk #menu-toggle { decorator: image(sp-menu-toggle-n); width: 53dp; height: 25dp; }
+            .sp-theme-steampunk #menu-toggle:hover { decorator: image(sp-menu-toggle-h); }
+            .sp-theme-steampunk #menu-toggle:active { decorator: image(sp-menu-toggle-a); }
+            .sp-theme-steampunk #menu-toggle.open { decorator: image(sp-menu-toggle-open-n); }
+            .sp-theme-steampunk #menu-toggle.open:hover { decorator: image(sp-menu-toggle-open-h); }
+            .sp-theme-steampunk #menu-toggle.open:active { decorator: image(sp-menu-toggle-open-a); }
+            .sp-theme-steampunk .tooltip .tooltiptext { left: auto; top: -5dp; right: 105%; height: 2.2em; min-width: 130dp; text-align: left; }
+            .sp-theme-steampunk str { color: rgb(90, 50, 15); }
+
+            @keyframes color_cycle {
+                from  { opacity: 0.5; image-color: rgba(200, 200, 200, 200); }
+                to  { opacity: 1; image-color: rgba(255, 255, 255, 255); }
+            }
+            @spritesheet sp-addons-menu
+            {
+                src: /data/ui/themes/rose/imgs/sp_addons_menu.dds;
+                resolution: 2x;
+                sp-addons-menu-n: 0px 0px 68px 60px;
+                sp-addons-menu-h: 70px 0px 68px 60px;
+                sp-addons-menu-a: 140px 0px 68px 60px;
+            }
+        </style>
+        <script>
+-- Theme check (add-on windows work with the default UI and with the Steampunk
+-- UI theme). Steampunk is installed when styles/steampunk.css exists; then this
+-- window gets the class sp-theme-steampunk and uses the Steampunk look,
+-- otherwise sp-theme-default and the game's own look. SP_THEME says which.
+pcall(function()
+    local sp = false
+    pcall(function()
+        local f = io.open('Data/ui/themes/rose/styles/steampunk.css', 'r')
+        if f then f:close(); sp = true end
+    end)
+    SP_THEME = sp and 'steampunk' or 'default'
+    local body = document:GetElementById('game-menu-hud')
+    if body then
+        body:SetClass('sp-theme-default', not sp)
+        body:SetClass('sp-theme-steampunk', sp)
+    end
+    -- (parts written for the other look stay in the window, hidden)
+end)
+        </script>
+    <script>
+-- Add-ons button: opens and closes the Add-ons window (sp_addons_window.html),
+-- where every installed add-on has its switch and settings, by section.
+pcall(function()
+    local document = document
+    local PATH = 'data/ui/themes/rose/game/sp_addons_window.html'
+    local btn = document:GetElementById('sp-addons-btn')
+    if not btn then return end
+    btn:AddEventListener('click', function()
+        pcall(function()
+            local ctx = document.context
+            local d = ctx.documents['sp-addons-window'] or ctx:LoadDocument(PATH)
+            if not d then return end
+            local vis = false
+            pcall(function() vis = d:IsVisible() end)
+            if vis then d:Hide() else d:Show() end
+        end)
+    end)
+end)
+    </script>
+    </head>
+
+    <body
+        id="game-menu-hud"
+        data-model="menu"
+    >
+        <div id="button-container" data-class-expanded="expanded && !has_premium_storage && !has_gamearena_scoreboard" data-class-expanded-premium="expanded && has_premium_storage && !has_gamearena_scoreboard"
+            data-class-expanded-scoreboard="expanded && has_gamearena_scoreboard && !has_premium_storage"
+            data-class-expanded-premium-scoreboard="expanded && has_premium_storage && has_gamearena_scoreboard">
+            <div class="tooltip" data-if="has_gamearena_scoreboard">
+                <button id="gamearena-scoreboard" onclick="open_gamearena_scoreboard" />
+                <span class="tooltiptext"><str>Game Arena Scoreboard</str></span>
+            </div>
+            <div class="tooltip">
+                <button id="item-mall" onclick="open_item_mall" />
+                <span class="tooltiptext">
+                    <str string-id="795" /><br/>
+                    <div class="hotkey">{{hotkey.item_mall}}</div>
+                </span>
+            </div>
+            <div class="tooltip" data-if="has_premium_storage">
+                <button id="premium-storage" onclick="open_premium_storage" />
+                <span class="tooltiptext">
+                    <str string-id="1184" />
+                    <div class="hotkey">{{hotkey.premium_storage}}</div>
+                </span>
+            </div>
+            <div class="tooltip">
+                <button id="character" onclick="open_character" />
+                <span class="tooltiptext">
+                    <str string-id="825" />
+                    <div class="hotkey">{{hotkey.character}}</div>
+                </span>
+            </div>
+            <div class="tooltip">
+                <button id="game-arena" onclick="open_game_arena" />
+                <span class="tooltiptext">
+                    <str string-id="406" />
+                    <div class="hotkey">{{hotkey.game_arena}}</div>
+                </span>
+            </div>
+            <div class="tooltip">
+                <button id="group-manager-menu" onclick="open_group_manager" />
+                <span class="tooltiptext">
+                    <str>Group Manager</str>
+                    <div class="hotkey">{{hotkey.group_manager}}</div>
+                </span>
+            </div>
+            <div class="tooltip">
+                <button id="inventory" onclick="open_inventory" />
+                <span class="tooltiptext">
+                    <str string-id="826" />
+                    <div class="hotkey">{{hotkey.inventory}}</div>
+                </span>
+            </div>
+            <div class="tooltip">
+                <button id="skill-list" onclick="open_skill_list" />
+                <span class="tooltiptext">
+                    <str string-id="827" />
+                    <div class="hotkey">{{hotkey.skill_list}}</div>
+                </span>
+            </div>
+            <div class="tooltip">
+                <button id="quest-list" onclick="open_quest_list" />
+                <span class="tooltiptext">
+                    <str string-id="828" />
+                    <div class="hotkey">{{hotkey.quest_list}}</div>
+                </span>
+            </div>
+            <div class="tooltip">
+                <button id="friend-list" onclick="open_friend_list" />
+                <span class="tooltiptext">
+                    <str string-id="829" />
+                    <div class="hotkey">{{hotkey.friend_list}}</div>
+                </span>
+            </div>
+            <div class="tooltip">
+                <button id="party-finder" onclick="open_party_finder" />
+                <span class="tooltiptext">
+                    <str>Party Finder</str>
+                    <div class="hotkey">{{hotkey.party_finder}}</div>
+                </span>
+            </div>
+            <div class="tooltip">
+                <button id="mail" onclick="open_mail" />
+                <span class="tooltiptext">
+                    <str>Inbox</str>
+                    <div class="hotkey">{{hotkey.mail}}</div>
+                </span>
+            </div>
+            <div class="tooltip">
+                <button id="clan" onclick="open_clan" />
+                <span class="tooltiptext">
+                    <str string-id="830" />
+                    <div class="hotkey">{{hotkey.clan}}</div>
+                </span>
+            </div>
+            <div class="tooltip">
+                <button id="sp-addons-btn" />
+                <span class="tooltiptext"><str>Add-ons</str></span>
+            </div>
+            <div class="tooltip">
+                <button id="system" onclick="open_system" />
+                <span class="tooltiptext">
+                    <str string-id="831" />
+                    <div class="hotkey">{{hotkey.system}}</div>
+                </span>
+            </div>
+        </div>
+        <button id="menu-toggle" data-event-click="expanded = !expanded" data-class-open="expanded" />
+    </body>
+</rml>
