@@ -1,11 +1,11 @@
 ; Update list for Movable HUD. Upload this next to mod.ini and the files folder.
-version=1.16
-7539db2c11cb98cba6fce30fa5fdf709bb6248f5|mod.ini
+version=1.17
+247748447bbf5a0570dda08cd43b89b3cd6d653c|mod.ini
 f27a64ce0bcc783fb7df6d9c59fcbc82c253a37b|files/Data/ui/sp_addons/hud_move.txt
 fdb56cd3aed46959458fdee8deb57f77f3faf5cd|files/Data/ui/themes/rose/game/hud.html
 1448712518c250158022e27eee1408bdd42eadec|files/Data/ui/themes/rose/game/menu.html
-7107b69fefdb768eb7b6e3919c3cf6cd2f99c7a8|files/Data/ui/themes/rose/game/options_bgfx.html
-2d3b3ec1fd292a99466dd3d88e88f41744e0bc45|files/Data/ui/themes/rose/game/sp_addons_window.html
+9ffac394fb7529b7d21c0378cea78e3d1ca2b906|files/Data/ui/themes/rose/game/options_bgfx.html
+954549bdb0200531ee4ce431fafd1119fc3d2849|files/Data/ui/themes/rose/game/sp_addons_window.html
 d49230528a09bf1485a759277d682bf3a6d98230|files/Data/ui/themes/rose/imgs/sp_addons_menu.dds
 c9735755117dd4fa76a010d9d13085fefdd2dfb1|files/Data/ui/themes/rose/styles/sp_addons_steampunk.css
 d91eeca9018f74fcc0129e8769899178111feb8f|files/Data/ui/themes/rose/styles/sp_addons_steampunk_sprites.css

@@ -43,6 +43,9 @@
             .keybind-table button.default { min-width: 0dp; width: 130dp; }
             h3 { margin-bottom: 3dp; }
             .button-row { display: flex; justify-content: flex-end; margin-top: 6dp; }
+            #sp-label-row { display: none; }
+            #sp-label-row.sp-shown { display: table-row; }
+            .sp-note { font-size: 11dp; color: rgb(180, 180, 180); }
 
             /* ==== Default UI look only ==== */
             .sp-theme-default .settings-group { display: block; padding: 8dp 10dp; margin-bottom: 6dp; background: rgba(0, 0, 0, 50); border: 1dp rgba(120, 120, 120, 80); border-radius: 4dp; box-sizing: border-box; }
@@ -77,6 +80,125 @@ pcall(function()
     -- (parts written for the other look stay in the window, hidden)
 end)
         </script>
+    <script>
+-- Dropped item label background: a 0-10 slider (0 = clear, 10 = solid).
+-- Shared by options_bgfx.html (the slider) and dropped_item_labels.html
+-- (the labels). The value is saved to a small text file when the game's
+-- Lua allows file access. Written inline because the game ignores edited .lua files.
+local SAVE_FILE = 'sp_label_alpha.txt'
+local DEFAULT = 0
+local LABELS_ID = 'dropped-item-labels'
+local ROOT_ID = 'dropped-item-labels-root'
+
+local function load_value()
+    local ok, v = pcall(function()
+        local f = io.open(SAVE_FILE, 'r')
+        if not f then return nil end
+        local n = tonumber(f:read('*l'))
+        f:close()
+        return n
+    end)
+    if ok and v then return math.max(0, math.min(10, math.floor(v))) end
+    if _G and type(_G.SP_LABEL_ALPHA) == 'number' then return _G.SP_LABEL_ALPHA end
+    return DEFAULT
+end
+
+local function save_value(v)
+    if _G then _G.SP_LABEL_ALPHA = v end
+    pcall(function()
+        local f = io.open(SAVE_FILE, 'w')
+        if f then f:write(tostring(v)); f:close() end
+    end)
+end
+
+-- Put class sp-alpha-<v> on the labels root (and remove the others)
+local function apply_to(doc, v)
+    if not doc then return false end
+    local root = doc:GetElementById(ROOT_ID)
+    if not root then return false end
+    for i = 0, 10 do root:SetClass('sp-alpha-' .. i, i == v) end
+    return true
+end
+
+local value = load_value()
+
+if document:GetElementById(ROOT_ID) then
+    ------------------------------------------------ labels document
+    apply_to(document, value)
+    local me = document
+    if _G then _G.SP_LABELS_APPLY = function(v) apply_to(me, v) end end
+else
+    ------------------------------------------------ options document
+  local ok, err = pcall(function()
+    local slider = document:GetElementById('sp-label-alpha')
+    local readout = document:GetElementById('sp-label-alpha-value')
+    local function show(v) if readout then readout.inner_rml = string.format('%d', math.floor(v * 10 + 0.5)) .. '%' end end
+
+    local function push(v)
+        -- 1) the labels document registered a function
+        local dbg = document:GetElementById('sp-label-alpha-debug')
+        if _G and type(_G.SP_LABELS_APPLY) == 'function' and pcall(_G.SP_LABELS_APPLY, v) then
+            if dbg then dbg.inner_rml = '' end
+            return
+        end
+        local reached = false
+        -- 2) find the labels document through the context
+        pcall(function()
+            local ctx = document.context
+            local doc = ctx.documents[LABELS_ID]
+            reached = apply_to(doc, v)
+            if not reached then
+                for i = 0, #ctx.documents - 1 do
+                    local d = ctx.documents[i]
+                    if d and d.id == LABELS_ID then reached = apply_to(d, v) break end
+                end
+            end
+        end)
+        if dbg then dbg.inner_rml = reached and '' or 'Saved. The labels will update after a restart (could not reach them live).' end
+    end
+
+    if slider then
+        slider:SetAttribute('value', tostring(value))
+        show(value)
+        slider:AddEventListener('change', function(event)
+            local v = tonumber(event.parameters and event.parameters.value)
+            if v == nil then pcall(function() v = tonumber(slider.value) end) end
+            if v == nil then pcall(function() v = tonumber(event.current_element:GetAttribute('value')) end) end
+            if v == nil then v = tonumber(slider:GetAttribute('value')) or value end
+            v = math.max(0, math.min(10, math.floor(v + 0.5)))
+            value = v
+            show(v)
+            save_value(v)
+            push(v)
+        end)
+    end
+    push(value)
+  end)
+  if not ok then
+    local r = document:GetElementById('sp-label-alpha-value')
+    if r then r.inner_rml = 'Lua error' end
+    local d = document:GetElementById('sp-label-alpha-debug')
+    if d then d.inner_rml = tostring(err):gsub('&','&amp;'):gsub('<','&lt;') end
+  end
+end
+
+    
+    </script>
+    <script>
+-- Show the slider row while the Dropped Item Labels add-on is installed
+-- (Steampunk has it built in).
+pcall(function()
+    local on = SP_THEME == 'steampunk'
+    if not on then
+        pcall(function()
+            local f = io.open('Data/ui/sp_addons/item_labels.txt', 'r')
+            if f then f:close(); on = true end
+        end)
+    end
+    local row = document:GetElementById('sp-label-row')
+    if row then row:SetClass('sp-shown', on) end
+end)
+    </script>
     </head>
 
     <body id="game-options" template="window-resizeable">
@@ -855,6 +977,18 @@ end)
                                     <td>
                                         <input id="item-name" type="checkbox" data-checked="game.show_item_name" onchange="game-itemname"/>
                                         <label for="item-name"><str string-id="1367">Show dropped item name</str></label>
+                                    </td>
+                                </tr>
+                                <!-- Dropped Item Labels add-on: a background behind dropped item names
+                                     (shown while the add-on is installed and item names are on) -->
+                                <tr id="sp-label-row" data-if="game.show_item_name">
+                                    <td>Label background</td>
+                                    <td>
+                                        <div class="slider-row">
+                                            <input id="sp-label-alpha" type="range" min="0" max="10" step="1" value="0" style="flex: 1" />
+                                            <label class="slider-value" id="sp-label-alpha-value"></label>
+                                        </div>
+                                        <div id="sp-label-alpha-debug" class="sp-note"></div>
                                     </td>
                                 </tr>
                                 <tr>
